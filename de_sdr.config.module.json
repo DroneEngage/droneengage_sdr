@@ -1,0 +1,34 @@
+{ 
+  // A name and GUID for this module as multiple modules sometimes can be added.
+  "module_id": "SDR", 
+  
+  // IP & Port Communication Module is listening to.
+  "s2s_udp_target_ip": "127.0.0.1",
+  "s2s_udp_target_port": "60000", 
+  // IP & Port of this module
+  "s2s_udp_listening_ip": "127.0.0.1", 
+  "s2s_udp_listening_port": "61024", 
+  "s2s_udp_packet_size": "8192",
+  
+  // Using serial interface: static port 
+  "sdr_communication":
+  {
+    "connection"  : "serial",
+    "unit_location": {
+        "lng": 30.00,
+        "lat": 30.00,
+        "alt": 120
+    }
+  },
+
+
+      
+  // Logger Section
+  "logger_enabled"            : true,
+  "logger_debug"              : false
+
+  
+}
+
+
+

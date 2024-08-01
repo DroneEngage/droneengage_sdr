@@ -1,0 +1,8 @@
+/bin/
+/build/
+/Debug/
+
+de_sdr.local
+
+*.sh
+!build.sh
