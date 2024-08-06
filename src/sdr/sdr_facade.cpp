@@ -3,7 +3,7 @@
 #include "../helpers/helpers.hpp"
 
 #include "sdr_facade.hpp"
-
+#include "sdr_main.hpp"
 #include "sdr_driver.hpp"
 
 using namespace de::sdr;
@@ -13,33 +13,19 @@ using namespace de::comm;
 
 void CSDR_Facade::API_SDRInfo(const std::string&target_party_id) const
 {
-    
     //de::andruav_servers::CP2P& cP2P = de::andruav_servers::CP2P::getInstance();
     CSDRDriver& cSDRDriver  = CSDRDriver::getInstance();
     
     Json_de jMsg = 
         {
-    //         {"c",  static_cast<int>(me_unit_p2p_info.p2p_connection_type)},
-    //         {"a1", static_cast<std::string>(me_unit_p2p_info.address_1)},
-    //         {"a2", static_cast<std::string>(me_unit_p2p_info.address_ap)},
-    //         {"wc", static_cast<std::uint8_t>(me_unit_p2p_info.wifi_channel)},
-    //         {"wp", static_cast<std::string>(me_unit_p2p_info.wifi_password)},
-
-    //         {"pa", static_cast<std::string>(me_unit_p2p_info.parent_address)},
-    //         {"pc", static_cast<bool>(me_unit_p2p_info.parent_connection_status)},
-    //         {"f",  static_cast<std::string>(me_unit_p2p_info.firmware_version)},
-    //         {"lp", static_cast<std::string>(cP2P.getExpectedParentMac())},
-            
-    //         {"a", static_cast<bool>(me_unit_p2p_info.driver_connected)},
-    //         {"o", static_cast<bool>(me_unit_p2p_info.is_p2p_connected)},
-    //         {"d", static_cast<bool>(me_unit_p2p_info.is_p2p_disabled)}
-            {"c",1},
+            {"c" , cSDRDriver.getStatus()},
             {"fc", cSDRDriver.getFrequencyCenter()},
-            {"f", cSDRDriver.getFrequency()},
-            {"s", cSDRDriver.getSampleRate()},
-            {"g", cSDRDriver.getGain()},
-            {"d", cSDRDriver.getDecodeMode()},
-            {"b", cSDRDriver.getBandWidth()}
+            {"f" , cSDRDriver.getFrequency()},
+            {"s" , cSDRDriver.getSampleRate()},
+            {"g" , cSDRDriver.getGain()},
+            {"m" , cSDRDriver.getDecodeMode()},
+            {"b" , cSDRDriver.getBandWidth()},
+            {"i" , cSDRDriver.getSDRDriverIndex()}
         };
 
     #ifdef DDEBUG
@@ -48,5 +34,77 @@ void CSDR_Facade::API_SDRInfo(const std::string&target_party_id) const
     
     m_module.sendJMSG (target_party_id, jMsg, TYPE_AndruavMessage_SDR_INFO,  false);
     
+}
+
+void CSDR_Facade::API_SendSDRDrivers (const std::string& target_party_id) const
+{
+    CSDRDriver& cSDRDriver  = CSDRDriver::getInstance();
+    cSDRDriver.listDevices();
+    std::vector<SoapySDR::Kwargs> device_args = cSDRDriver.get_device_agrs();
+    SoapySDR::Kwargs device_arg;
+    
+    Json_de drivers_array; 
+    Json_de driver;
+
+    for(unsigned int k=0;k<device_args.size();++k)
+    {
+		device_arg = device_args[k];
+        int driver_index = -1;
+		for (SoapySDR::Kwargs::const_iterator it = device_arg.begin(); it != device_arg.end(); ++it)
+        {
+            std::cout << it->first << " = " << it->second << std::endl;
+
+            if (it->first == "index")
+            {
+                std::cout << it->first << " == " << it->second << std::endl;
+                driver_index = std::atoi(it->second.c_str());
+                driver[it->first] = driver_index;
+            }
+            else
+            {
+                driver[it->first] = it->second;
+            }
+		}
+
+        drivers_array[driver_index] = driver;
+        
+    }
+
+    
+    Json_de jMsg = 
+        {
+            {"a" , SDR_ACTION_LIST_SDR_DEVICES},
+            {"dr", drivers_array},
+        };
+
+    m_module.sendJMSG (target_party_id, jMsg, TYPE_AndruavMessage_SDR_STATUS,  false);
+}
+            
+
+void CSDR_Facade::sendLocationInfo (const std::string&target_party_id) const 
+{
+    /*
+        la          : latitude   [degE7]
+        ln          : longitude  [degE7]
+        a           : absolute altitude
+        r           : relative altitude
+    */
+    
+    de::sdr::CSDRMain& cSDRMain = de::sdr::CSDRMain::getInstance();
+
+    if (!cSDRMain.getLocationReportStatus()) return ;
+    Json_de message=
+    {
+        {"la", cSDRMain.getLatitude()},         // latitude   [degE7]
+        {"ln", cSDRMain.getLongitude()},        // longitude  [degE7]
+        {"a", 0},                               // absolute altitude in mm
+        {"r", 0},                               // relative altitude in mm
+        {"y", 0},                               // yaw in cdeg
+        {"3D",0},
+        {"SC",0},
+        {"p",0}
+    };
+
+    m_module.sendJMSG (target_party_id, message, TYPE_AndruavMessage_GPS, false);
 }
 

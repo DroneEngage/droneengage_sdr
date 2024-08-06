@@ -77,6 +77,28 @@ namespace sdr
                 m_group_id = group_id;
             };
 
+
+        public:
+
+            inline double getLatitude()
+            {
+                return m_latitude;
+            }
+
+            inline double getLongitude()
+            {
+                return m_longitude;
+            }
+
+            inline double getLocationReportStatus()
+            {
+                return m_report_static_location;
+            }
+            
+
+        protected:
+            void initSDRParameters();
+
         private:
             de::sdr::CSDR_Facade& m_sdr_facade = de::sdr::CSDR_Facade::getInstance();
 
@@ -88,6 +110,10 @@ namespace sdr
             std::string m_party_id;
             std::string m_group_id;
 
+            std::string m_driver;
+
+            double m_latitude, m_longitude;
+            bool m_report_static_location = false;
             
     };
 

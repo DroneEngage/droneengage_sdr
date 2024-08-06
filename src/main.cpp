@@ -52,13 +52,6 @@ de::CLocalConfigFile& cLocalConfigFile = de::CLocalConfigFile::getInstance();
  */
 static std::string hardware_serial;
 
-/**
- * @brief configuraytion file path & name
- * 
- */
-static std::string configName = "de_sdr.config.module.json";
-static std::string localConfigName = "de_sdr.local";
-
 
        
 void quit_handler( int sig );
@@ -142,13 +135,11 @@ void onReceive (const char * message, int len, Json_de jMsg)
         }
 
         cSDRParser.parseMessage(jMsg, message, len);
-    
     }
     catch(const std::exception& e)
     {
         std::cerr << e.what() << '\n';
     }
-    
 }
 
 
@@ -202,7 +193,7 @@ void initArguments (int argc, char *argv[])
 }
 
 
-void initUavosModule(int argc, char *argv[])
+void initDEModule(int argc, char *argv[])
 {
     const Json_de& jsonConfig = cConfigFile.GetConfigJSON();
     CLocalConfigFile& cLocalConfigFile = de::CLocalConfigFile::getInstance();
@@ -219,8 +210,6 @@ void initUavosModule(int argc, char *argv[])
     cModule.addModuleFeatures(MODULE_FEATURE_RECEIVING_TELEMETRY);
     cModule.setHardware(hardware_serial, ENUM_HARDWARE_TYPE::HARDWARE_TYPE_CPU);
     
-    
-
     cModule.setMessageOnReceive (&onReceive);
     
     
@@ -250,6 +239,9 @@ void initSerial()
     hardware_serial.append(get_linux_machine_id());
 }
 
+
+
+
 /**
  * initialize components
  **/
@@ -273,7 +265,6 @@ void init (int argc, char *argv[])
     cConfigFile.initConfigFile (configName.c_str());
     cLocalConfigFile.InitConfigFile (localConfigName.c_str());
 
-    cSDRMain.init();
     
     ModuleKey = cLocalConfigFile.getStringField("module_key");
     if (ModuleKey=="")
@@ -284,9 +275,10 @@ void init (int argc, char *argv[])
         cLocalConfigFile.apply();
     }
 
-
+    cSDRMain.init();
+    
     // should be last
-    initUavosModule (argc,argv);
+    initDEModule (argc,argv);
 
 }
 
@@ -328,8 +320,10 @@ void quit_handler( int sig )
         exit_me = true;
         uninit();
 	}
-	catch (int error){}
+	catch (int error)
+    {
 
+    }
 }
 
 int main (int argc, char *argv[])
@@ -339,7 +333,5 @@ int main (int argc, char *argv[])
     while (!exit_me)
     {
        std::this_thread::sleep_for(std::chrono::seconds(1));
-       
     }
-
 }

@@ -43,4 +43,13 @@ typedef struct DE_UNIT_P2P_INFO{
 } DE_UNIT_P2P_INFO;
 
 
+/**
+ * @brief configuraytion file path & name
+ * 
+ */
+static std::string configName = "de_sdr.config.module.json";
+static std::string localConfigName = "de_sdr.local";
+
+
+
 #endif

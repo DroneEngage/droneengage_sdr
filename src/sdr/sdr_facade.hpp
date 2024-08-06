@@ -45,7 +45,8 @@ namespace sdr
         public:
         
             void API_SDRInfo (const std::string& target_party_id) const;
-
+            void API_SendSDRDrivers (const std::string& target_party_id) const;
+            void sendLocationInfo (const std::string&target_party_id) const;
 
         
         protected:

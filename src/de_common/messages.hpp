@@ -311,9 +311,9 @@
 
 #define SDR_ACTION_CONNECT                                  0
 #define SDR_ACTION_DISCONNECT                               1
-#define SDR_ACTION_RECONNECT                                2
-
-#define SDR_STATUS_DEVICE_INFO                              0
+#define SDR_ACTION_LIST_SDR_DEVICES                         2
+#define SDR_ACTION_SET_CONFIG                               3
+#define SDR_ACTION_READ_DATA                                4
 
 
 // CAMERA MODULE MESSAGES
@@ -369,6 +369,7 @@
 #define ERROR_RCCONTROL                         12
 #define ERROR_TYPE_ERROR_MODULE                 13
 #define ERROR_TYPE_ERROR_P2P                    23
+#define ERROR_TYPE_ERROR_SDR                    24
 #define ERROR_GEO_FENCE_ERROR                   100
 
 // 0	MAV_SEVERITY_EMERGENCY	System is unusable. This is a "panic" condition.

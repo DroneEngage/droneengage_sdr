@@ -5,6 +5,7 @@
 #include <sstream>
 #include <fstream>
 #include <memory> 
+#include <limits>
 #include "../helpers/colors.hpp"
 #include "../helpers/helpers.hpp"
 
@@ -47,7 +48,7 @@ void CLocalConfigFile::clearFile()
 void CLocalConfigFile::WriteFile (const char * fileURL)
 {
     std::ofstream stream;
-    std::cout << _LOG_CONSOLE_BOLD_TEXT<< "Write internal config file: " << _SUCCESS_CONSOLE_TEXT_ << fileURL << _NORMAL_CONSOLE_TEXT_ << " ...." ;
+    std::cout << _LOG_CONSOLE_BOLD_TEXT<< "Write internal config file: " << _INFO_CONSOLE_TEXT << fileURL << _NORMAL_CONSOLE_TEXT_ << " ...." ;
 
     stream.open (fileURL , std::ifstream::out | std::ios::trunc );
     if (!stream) {
@@ -126,4 +127,19 @@ const u_int32_t CLocalConfigFile::getNumericField(const char * field) const
     if (!m_ConfigJSON.contains(std::string(field))) return 0xffffffff;
 
     return m_ConfigJSON[std::string(field)].get<int>();
+}
+
+void CLocalConfigFile::addDecimalField(const char * field, const double & value)
+{
+    m_ConfigJSON[std::string(field)] = value;
+}
+
+
+bool CLocalConfigFile::getDecimalField(const char * field , double &value) const 
+{
+    if (!m_ConfigJSON.contains(std::string(field))) return false;
+
+    value= m_ConfigJSON[std::string(field)].get<double>();
+
+    return true;
 }
