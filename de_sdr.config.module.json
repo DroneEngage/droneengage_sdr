@@ -11,16 +11,15 @@
   "s2s_udp_packet_size": "8192",
   
   // Using serial interface: static port 
-  "sdr_communication":
+  "sdr_config":
   {
-    "connection"  : "serial",
-    "unit_location": {
-        "lng": 30.00,
-        "lat": 30.00,
+    "driver"  : "soapyMiri",
+    "location": {
+        "lng": 149.165926,
+        "lat": -35.353846,
         "alt": 120
     }
   },
-
 
       
   // Logger Section

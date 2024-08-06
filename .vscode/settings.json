@@ -74,5 +74,6 @@
         "variant": "cpp",
         "rtaudio.h": "c",
         "liquid.h": "c"
-    }
+    },
+    "stm32-for-vscode.openOCDPath": false
 }
