@@ -48,6 +48,7 @@ namespace sdr
             void API_SendSDRDrivers (const std::string& target_party_id) const;
             void sendLocationInfo (const std::string&target_party_id) const;
 
+            void sendSpectrumResultInfo (const std::string&target_party_id, const double frequency_min, const float frequency_step, const uint64_t number_of_data , const float * result) const;
         
         protected:
 

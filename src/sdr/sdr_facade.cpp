@@ -92,7 +92,6 @@ void CSDR_Facade::sendLocationInfo (const std::string&target_party_id) const
     
     de::sdr::CSDRMain& cSDRMain = de::sdr::CSDRMain::getInstance();
 
-    if (!cSDRMain.getLocationReportStatus()) return ;
     Json_de message=
     {
         {"la", cSDRMain.getLatitude()},         // latitude   [degE7]
@@ -106,5 +105,19 @@ void CSDR_Facade::sendLocationInfo (const std::string&target_party_id) const
     };
 
     m_module.sendJMSG (target_party_id, message, TYPE_AndruavMessage_GPS, false);
+}
+
+
+void CSDR_Facade::sendSpectrumResultInfo (const std::string&target_party_id, const double frequency_min, const float frequency_step, const uint64_t number_of_data , const float * result) const 
+{
+    Json_de msg_cmd = {};
+    const uint64_t now = get_time_usec();
+    // the message is big so few more characters to make it more readable is OK.
+    msg_cmd["fcm"]  = frequency_min;
+    msg_cmd["fcst"] = frequency_step;
+    msg_cmd["tim"]  = now;
+
+        
+    m_module.sendBMSG ("", (char *)result, number_of_data * sizeof(float), TYPE_AndruavMessage_SDR_SPECTRUM, false, msg_cmd);
 }
 

@@ -35,7 +35,7 @@ std::string formatMacAddress(const std::vector<uint8_t>& mac_address_bytes, cons
     std::stringstream bssid;
 
     bssid << std::setw(2) << std::setfill('0') << std::hex; 
-    for (int i = 0; i < mac_address_bytes.size(); i++) {
+    for (int i = 0; i < (int) mac_address_bytes.size(); i++) {
         if (add_colon && (i > 0)) {
             bssid << ":";
         }

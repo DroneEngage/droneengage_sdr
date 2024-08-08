@@ -117,7 +117,7 @@ void CSDRParser::parseMessage (Json_de &andruav_message, const char * full_messa
                         }
 
                         // broadcast updated info.
-                        CSDRDriver::getInstance().connect();
+                        CSDRDriver::getInstance().openSDR();
 
                         CSDR_Facade::getInstance().API_SDRInfo(std::string(""));
                         CSDR_Facade::getInstance().sendLocationInfo(std::string(""));

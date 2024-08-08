@@ -19,9 +19,14 @@
         "lat": -35.353846,
         "alt": 120
     }
+    // "location": {
+    //     "lng": 37.604203,
+    //     "lat": 55.770899,
+    //     "alt": 120
+    // }
   },
 
-      
+  
   // Logger Section
   "logger_enabled"            : true,
   "logger_debug"              : false

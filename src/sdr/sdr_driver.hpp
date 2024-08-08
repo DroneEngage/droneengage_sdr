@@ -144,14 +144,11 @@ namespace sdr
 
             bool init();
             void listDevices();
-            bool openStream(const int device_index);
             void startStreaming();
         
             bool openSDR();
             bool closeSDR();
         
-        public:
-            void connect();
             
         public:
 
@@ -165,12 +162,6 @@ namespace sdr
                 return m_sdr_index;
             }
 
-            // inline void setSDRDriver(const std::string sdr_driver)
-            // {
-            //     m_sdr_driver = sdr_driver;
-            // }
-
-            
             inline float getFrequencyCenter() const
             {
                 return m_sdr_rx.fc;
@@ -273,7 +264,7 @@ namespace sdr
 
             fftwf_plan p1;
             fftwf_plan p2;
-            size_t MTU;
+            size_t m_max_tx_unit;
     };
 }
 }

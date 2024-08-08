@@ -30,7 +30,7 @@ void de::sdr::CSDRMain::loopScheduler()
             {   // each 10000 msec
                 
                 // CSDR_Facade::getInstance().API_SDRInfo("");
-                // CSDR_Facade::getInstance().sendLocationInfo("");
+                CSDR_Facade::getInstance().sendLocationInfo("");
             }
         }
         catch (int error)
