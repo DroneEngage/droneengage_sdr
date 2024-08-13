@@ -116,6 +116,11 @@ void CSDRParser::parseMessage (Json_de &andruav_message, const char * full_messa
                             cSDRDriver.setDecodeMode(cmd["m"].get<double>());
                         }
 
+                        if (cmd.contains("r"))
+                        {
+                            cSDRDriver.setBars(cmd["r"].get<double>());
+                        }
+
                         // broadcast updated info.
                         CSDRDriver::getInstance().openSDR();
 

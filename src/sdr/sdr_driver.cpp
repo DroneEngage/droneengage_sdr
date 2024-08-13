@@ -4,7 +4,7 @@
 #include "sdr_facade.hpp"
 #include "sdr_driver.hpp"
 
-#define DDEBUG 1
+//#define DDEBUG 1
 
 using namespace de::sdr;
 
@@ -108,7 +108,7 @@ int cStack::setBuff(DE_SDR_RX *rx)
 		if(buffa[k])free((char *)buffa[k]);
 		buffa[k]=(float *)malloc((size_t)(2*rx->faudio*4*sizeof(float)));
 		if(!buffa[k]){
-			fprintf(stderr,"10 cMalloc Errror %ld\n",(long)(2*rx->faudio*4));
+			fprintf(stderr,"malloc Error %ld\n",(long)(2*rx->faudio*4));
 			return 1;
 		}
 		memset(buffa[k],0,2*rx->faudio*4*sizeof(float));
@@ -504,27 +504,15 @@ void CSDRDriver::startStreaming()
             
             fftwf_execute(p1);
                     
-            if(true) { //count == -10){
-                // range from [sample_rate/2 - fc , sample_rate/2 + fc ]
-                // const double frequency_min = m_sdr_rx.fc-0.5*m_sdr_rx.sample_rate;
-                // printf("plot %d sinwave1\n",(int)m_sdr_rx.sample_rate);
-                // for(long int np=0;np<(long)(m_sdr_rx.sample_rate);++np){
-                //     //double frequency_value = buff2[np*2]*buff2[np*2]+buff2[np*2+1]*buff2[np*2+1];
-                //     double frequency_value = hypot(buff2[np*2],buff2[np*2+1]);
-                //     //if(frequency_value) frequency_value=sqrt(frequency_value);
-                //     double frequency=frequency_min + np;
-                    
-                //     if (frequency_value > 100.0)
-                //     {
-                //         printf("%f %f\n",frequency, frequency_value);
-                //     }
-                // }				
+            if(true) { 		
 
                 const double frequency_min = m_sdr_rx.fc - 0.5 * m_sdr_rx.sample_rate;
+                #ifdef DEBUG
                 printf("plot %d sinwave1\n", (int)m_sdr_rx.sample_rate);
-                const uint32_t bars = 20;
-                const uint64_t div = (int)m_sdr_rx.sample_rate / bars;
-                const float frquency_step = static_cast<float>(m_sdr_rx.sample_rate) / bars;
+                #endif
+                
+                const uint64_t div = (int)m_sdr_rx.sample_rate / m_bars;
+                const float frquency_step = static_cast<float>(m_sdr_rx.sample_rate) / m_bars;
                 const long int num_output_points = m_sdr_rx.sample_rate / div;
                 
                 std::vector<float> output(num_output_points);
@@ -543,14 +531,18 @@ void CSDRDriver::startStreaming()
                     }
 
                     double average_frequency_value = frequency_value_sum / frquency_step;
-                    double average_frequency = frequency_sum / frquency_step;
                     output[number_of_data] = static_cast<float>(average_frequency_value);
                     ++number_of_data;
-                    //if (average_frequency_value > 100.0) {
+                    #ifdef DDEBUG
+                        double average_frequency = frequency_sum / frquency_step;
                         printf("%f %f\n", average_frequency, average_frequency_value);
-                    //}
+                    #endif
                 }
-                                                                 
+                
+                #ifdef DEBUG
+                    std::cout << "sendSpectrumResultInfo" << std::endl;                             
+                #endif
+
                 CSDR_Facade::getInstance().sendSpectrumResultInfo("", frequency_min, frquency_step, output.size(), output.data());
 
             }

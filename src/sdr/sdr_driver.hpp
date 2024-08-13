@@ -7,7 +7,6 @@
 #include <SoapySDR/Formats.h>
 #include <vector>
 #include <string>
-#include <rtaudio/RtAudio.h>
 #include <liquid/liquid.h>
 #include <fftw3.h>
 #include <mutex>
@@ -162,6 +161,17 @@ namespace sdr
                 return m_sdr_index;
             }
 
+            inline uint64_t getBars() const
+            {
+                return m_bars;
+            }
+
+            inline void setBars(const uint64_t bars)
+            {
+                m_bars = bars;
+            }
+
+
             inline float getFrequencyCenter() const
             {
                 return m_sdr_rx.fc;
@@ -248,8 +258,6 @@ namespace sdr
         private:
 
             DE_SDR_RX m_sdr_rx;
-            RtAudio m_dac;
-            std::vector<RtAudio::DeviceInfo> m_devices;
             std::vector<SoapySDR::Kwargs> m_device_args;
             SoapySDR::Device *m_sdr = NULL;
             SoapySDR::Stream *m_rxStream = NULL;
@@ -265,6 +273,8 @@ namespace sdr
             fftwf_plan p1;
             fftwf_plan p2;
             size_t m_max_tx_unit;
+
+            uint64_t m_bars = 32;
     };
 }
 }
