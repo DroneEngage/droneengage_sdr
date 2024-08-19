@@ -48,7 +48,7 @@ void de::sdr::CSDRMain::initSDRParameters()
     de::CConfigFile& cConfigFile = de::CConfigFile::getInstance();
     de::CLocalConfigFile& cLocalConfigFile = de::CLocalConfigFile::getInstance();
 
-    std::string m_driver = cLocalConfigFile.getStringField("driver");
+    m_driver = cLocalConfigFile.getStringField("driver");
     if (m_driver=="")
     {
         const Json_de& jsonConfig = cConfigFile.GetConfigJSON();
@@ -133,8 +133,9 @@ bool de::sdr::CSDRMain::init()
 
     initSDRParameters();
 
-
-    CSDRDriver::getInstance().setSDRDriverIndex(0);
+    
+    CSDRDriver::getInstance().setSDRDriverByName(m_driver);
+    //CSDRDriver::getInstance().setSDRDriverIndex(0);
     CSDRDriver::getInstance().init();
 
     m_exit_thread = false; 

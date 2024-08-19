@@ -1,4 +1,4 @@
-
+#include "../helpers/colors.hpp"
 #include "../de_common/configFile.hpp"
 #include "../de_common/messages.hpp"
 #include "sdr_facade.hpp"
@@ -306,6 +306,30 @@ void CSDRDriver::setSDRDriverIndex(const int  sdr_driver_index)
 
 }
 
+void CSDRDriver::setSDRDriverByName( const std::string sdr_driver)
+{
+    listDevices();
+
+    for (int i = 0 ; i < (int)m_device_args.size() ; ++i)
+    {
+        SoapySDR::Kwargs device_arg = m_device_args[i]; 
+        
+        for (SoapySDR::Kwargs::const_iterator it = device_arg.begin(); it != device_arg.end(); ++it) {
+            std::cout << it->first << " = " << it->second << std::endl;
+            if (it->first=="driver")
+            {
+                if (sdr_driver == it->second)
+                {
+                    m_sdr_index = i;
+                    m_sdr_driver = it->second;
+
+                }
+                return ;
+            }
+        }
+    }
+}
+
 
 
 bool CSDRDriver::closeSDR()
@@ -333,8 +357,6 @@ bool CSDRDriver::closeSDR()
         if(buff3)delete [] buff3;
         buff3 = NULL;
         
-        //if(rx->cs)delete rx->cs; // sound
-
         return true;
     }
     catch (...)
@@ -359,7 +381,6 @@ bool CSDRDriver::openSDR( )
     }
 
     setStatus(ENUM_STATE::NOT_CONNECTED);
-    //listDevices();
     setSDRDriverIndex(m_sdr_index);
 
     // Open SDR Device.
@@ -405,7 +426,7 @@ bool CSDRDriver::openSDR( )
 	const int ret = m_sdr->activateStream(m_rxStream, 0, 0, 0); 
     if (ret !=0)
     {
-        std::cout << "Could not activate stream." << std::endl;
+        std::cout << _ERROR_CONSOLE_BOLD_TEXT_ << "ERROR: " << _TEXT_BOLD_HIGHTLITED_ << "Could not activate stream." <<_NORMAL_CONSOLE_TEXT_ << std::endl;
         setStatus(ENUM_STATE::ERROR);
         return false;
     }
@@ -438,7 +459,8 @@ bool CSDRDriver::openSDR( )
 	
 	p2 = fftwf_plan_dft_1d((int)m_sdr_rx.bw,(fftwf_complex *)buff3, (fftwf_complex *)buff1, FFTW_BACKWARD, FFTW_ESTIMATE);
 
-	fprintf(stderr,"Read m_sdr_rx.bw %d\n",(int)m_sdr_rx.bw);
+	
+    std::cout << _SUCCESS_CONSOLE_BOLD_TEXT_ << "Read  m_sdr_rx.bw " << std::to_string((int)m_sdr_rx.bw) <<_NORMAL_CONSOLE_TEXT_ << std::endl;
 	
     return true;
 }

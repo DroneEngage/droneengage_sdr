@@ -245,7 +245,7 @@ namespace sdr
         public:
 
             void setSDRDriverIndex(const int  sdr_driver_index);
-
+            void setSDRDriverByName(const std::string sdr_driver);
 
         private:
 
