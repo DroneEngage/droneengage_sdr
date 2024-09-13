@@ -193,12 +193,20 @@
  */
 #define TYPE_AndruavMessage_Ping_Unit                       1073
 
-#define TYPE_AndruavMessage_P2P_INFO                        1074
+/**
+ * @brief used to upload DroneEngage Mission File.
+ * 
+ * params:
+ *      [a]: p_textMission,
+ *      [e]: p_eraseFirst
+ */
+#define TYPE_AndruavMessage_Upload_DE_Mission           1075
 
 // Binary Messages 
 
 //deprecated telemetry technology
 #define TYPE_AndruavMessage_LightTelemetry                  2022
+
 
 /**********************************************************************
                         New Andruav Messages 2019
@@ -224,7 +232,6 @@
 #define TYPE_AndruavMessage_P2P_InRange_Node                6508
 
 
-
 /**
  * @brief used to set communication channels on/off
  * current fields are:
@@ -246,24 +253,10 @@
 #define TYPE_AndruavMessage_SDR_SPECTRUM                    6516
 
 
-
-/**
- * @brief used to set communication channels on/off
- * current fields are:
- * [p2p]: for turning p2p on/off or leave as is.
- * [ws]: for turning communication server websocket on/off or leave as is.
- * 
- */
-#define TYPE_AndruavMessage_Communication_Line_Set          6509
-
-#define TYPE_AndruavMessage_Communication_Line_Status       6510
-
-
+#define TYPE_AndruavMessage_P2P_INFO                        6517
 /**********************************************************************
                         EOF Andruav Messages 2019
 **********************************************************************/
-
-
 
 
 #define TYPE_AndruavMessage_DUMMY                           9999
