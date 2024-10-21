@@ -13,7 +13,7 @@
   // Using serial interface: static port 
   "sdr_config":
   {
-    "driver"  : "soapyMiri",
+    "driver"  : "RTLSDRBlog", //soapyMiri",
     "location": {
         "lng": 149.165926,
         "lat": -35.353846,
