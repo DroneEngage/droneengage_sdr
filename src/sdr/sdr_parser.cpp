@@ -91,11 +91,6 @@ void CSDRParser::parseMessage (Json_de &andruav_message, const char * full_messa
                             cSDRDriver.setFrequencyCenter(cmd["fc"].get<double>());
                         }
 
-                        if (cmd.contains("f"))
-                        {
-                            cSDRDriver.setFrequency(cmd["f"].get<double>());
-                        }
-
                         if (cmd.contains("b"))
                         {
                             cSDRDriver.setBandWidth(cmd["b"].get<double>());

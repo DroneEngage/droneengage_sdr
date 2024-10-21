@@ -437,7 +437,7 @@ bool CSDRDriver::openSDR( )
 
     setFilters(m_sdr_rx, m_sdr_rx.fs);
 
-    float shift=m_sdr_rx.fc - m_sdr_rx.f;
+    float shift=m_sdr_rx.fc - (m_sdr_rx.fc * 0.971698133); //estimation for m_sdr_rx.f;
 
     nco_crcf_set_frequency(m_sdr_rx.fs.fShift,(float) ((2.0 * M_PI) * (((double) abs(shift)) / ((double) m_sdr_rx.sample_rate))));
    
