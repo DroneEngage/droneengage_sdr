@@ -50,7 +50,7 @@ void CSDR_Facade::API_SendSDRDrivers (const std::string& target_party_id) const
     for(unsigned int k=0;k<device_args.size();++k)
     {
 		device_arg = device_args[k];
-        int driver_index = -1;
+        int driver_index = 0;
 		for (SoapySDR::Kwargs::const_iterator it = device_arg.begin(); it != device_arg.end(); ++it)
         {
             std::cout << it->first << " = " << it->second << std::endl;
