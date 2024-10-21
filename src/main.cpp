@@ -26,6 +26,8 @@ using namespace de;
                         TYPE_AndruavMessage_SDR_INFO, \
                         TYPE_AndruavMessage_SDR_ACTION, \
                         TYPE_AndruavMessage_SDR_STATUS, \
+                        TYPE_AndruavMessage_Upload_DE_Mission, \
+                        TYPE_AndruavMessage_Sync_EventFire, \
                         TYPE_AndruavMessage_DUMMY}
 
 // This is a timestamp used as instance unique number. if changed then communicator module knows module has restarted.

@@ -153,6 +153,13 @@ void CSDRParser::parseMessage (Json_de &andruav_message, const char * full_messa
             }
             break;
 
+            case TYPE_AndruavMessage_Upload_DE_Mission:
+            {
+
+            }
+            break;
+            
+
             default:
             {
 

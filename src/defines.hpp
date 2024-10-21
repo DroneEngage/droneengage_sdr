@@ -3,7 +3,7 @@
 
 #include <limits> 
 #include <string>
-
+#include <stdint.h>
 
 enum ANDRUAV_UNIT_P2P_TYPE 
 {   
@@ -23,7 +23,7 @@ typedef struct DE_UNIT_P2P_INFO{
     std::string address_1="";
     std::string address_ap="";
     
-    std::uint8_t wifi_channel=0;
+    uint8_t wifi_channel=0;
     std::string wifi_password="";
 
     std::string firmware_version = "na";
