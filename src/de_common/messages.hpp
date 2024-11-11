@@ -312,6 +312,7 @@
 #define SDR_ACTION_LIST_SDR_DEVICES                         2
 #define SDR_ACTION_SET_CONFIG                               3
 #define SDR_ACTION_READ_DATA                                4
+#define SDR_ACTION_SCAN_SPECTRUM                            5
 
 
 // CAMERA MODULE MESSAGES

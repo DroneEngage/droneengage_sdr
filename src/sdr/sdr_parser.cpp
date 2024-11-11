@@ -80,7 +80,22 @@ void CSDRParser::parseMessage (Json_de &andruav_message, const char * full_messa
 
                     case SDR_ACTION_SET_CONFIG:
                     {
-                        std::cout << cmd.dump() << std::endl;
+                        /**
+                         
+                            int     i:  driver index
+                            double fc:  frequency center
+                            double  b:  bandwidth
+                            double  g:  gain
+                            double  s:  sample Rate
+                            double  d:  decode mode
+                            double  r:  number of bars for barchart.
+                            [int     t]:  interval of sending data back per seconds [0 means ignore]. 
+
+                         */
+                        #ifdef DEBUG
+                            std::cout << cmd.dump() << std::endl;
+                        #endif
+                        
                         if (validateField(cmd,"i", Json_de::value_t::number_unsigned))
                         {
                             cSDRDriver.setSDRDriverIndex(cmd["i"].get<int>());
@@ -116,6 +131,16 @@ void CSDRParser::parseMessage (Json_de &andruav_message, const char * full_messa
                             cSDRDriver.setBars(cmd["r"].get<double>());
                         }
 
+                        if (validateField(cmd, "t", Json_de::value_t::number_unsigned))
+                        {   // milli-seconds
+                            cSDRDriver.setIntervals(cmd["t"].get<int>()); 
+                        }
+                        else
+                        {
+                            cSDRDriver.setIntervals(0);
+                        }
+
+
                         // broadcast updated info.
                         CSDRDriver::getInstance().openSDR();
 
@@ -126,13 +151,22 @@ void CSDRParser::parseMessage (Json_de &andruav_message, const char * full_messa
 
                     case SDR_ACTION_READ_DATA:
                     {
-                        //cSDRDriver.startStreaming();
                         g = std::thread {[&](){ 
                                 cSDRDriver.startStreaming();
                                 g.detach();}};
                     }
                     break;
                     
+
+                    case SDR_ACTION_SCAN_SPECTRUM:
+                    {
+                        #ifdef DEBUG
+                            std::cout << cmd.dump() << std::endl;
+                        #endif
+                        
+                    }
+                    break;
+
                     default:
                     {
 

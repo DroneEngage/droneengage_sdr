@@ -26,7 +26,8 @@ void CSDR_Facade::API_SDRInfo(const std::string&target_party_id) const
             {"m" , cSDRDriver.getDecodeMode()},
             {"b" , cSDRDriver.getBandWidth()},
             {"i" , cSDRDriver.getSDRDriverIndex()},
-            {"r" , cSDRDriver.getBars()}
+            {"r" , cSDRDriver.getBars()},
+            {"t" , cSDRDriver.getIntervals()}
         };
 
     #ifdef DDEBUG

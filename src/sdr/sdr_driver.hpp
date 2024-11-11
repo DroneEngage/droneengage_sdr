@@ -62,8 +62,9 @@ namespace sdr
 	{
 		NOT_CONNECTED       = 0,
         CONNECTED           = 1,
-		STREAMING           = 2,
-        ERROR               = 3
+		STREAMING_ONCE      = 2,
+        STREAMING_INTERVALS  = 4,
+        ERROR               = 999
 	};
 
     enum class ENUM_DECODING_MODE
@@ -143,8 +144,9 @@ namespace sdr
 
             bool init();
             void listDevices();
+            void startStreamingOnce();
             void startStreaming();
-        
+            
             bool openSDR();
             bool closeSDR();
         
@@ -171,6 +173,15 @@ namespace sdr
                 m_bars = bars;
             }
 
+            inline uint64_t getIntervals() const
+            {
+                return m_intervals;
+            }
+
+            inline void setIntervals(const uint64_t intervals)
+            {
+                m_intervals = intervals;
+            }
 
             inline float getFrequencyCenter() const
             {
@@ -275,6 +286,10 @@ namespace sdr
             size_t m_max_tx_unit;
 
             uint64_t m_bars = 32;
+            uint64_t m_intervals = 0; // no interval
+            bool m_exit = false;
+
+            std::mutex m_lock;
     };
 }
 }
