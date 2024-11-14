@@ -20,11 +20,9 @@ void CSDR_Facade::API_SDRInfo(const std::string&target_party_id) const
         {
             {"c" , cSDRDriver.getStatus()},
             {"fc", cSDRDriver.getFrequencyCenter()},
-            {"f" , cSDRDriver.getFrequency()},
             {"s" , cSDRDriver.getSampleRate()},
             {"g" , cSDRDriver.getGain()},
             {"m" , cSDRDriver.getDecodeMode()},
-            {"b" , cSDRDriver.getBandWidth()},
             {"i" , cSDRDriver.getSDRDriverIndex()},
             {"r" , cSDRDriver.getBars()},
             {"t" , cSDRDriver.getIntervals()}

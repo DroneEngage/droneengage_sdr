@@ -31,6 +31,9 @@ void CSDRParser::parseMessage (Json_de &andruav_message, const char * full_messa
         is_system = true;
     }
 
+    UNUSED(is_system);
+    UNUSED(permission);
+    
     if (messageType == TYPE_AndruavMessage_RemoteExecute)
     {
         parseRemoteExecute(andruav_message);
@@ -84,7 +87,6 @@ void CSDRParser::parseMessage (Json_de &andruav_message, const char * full_messa
                          
                             int     i:  driver index
                             double fc:  frequency center
-                            double  b:  bandwidth
                             double  g:  gain
                             double  s:  sample Rate
                             double  d:  decode mode
@@ -108,7 +110,7 @@ void CSDRParser::parseMessage (Json_de &andruav_message, const char * full_messa
 
                         if (cmd.contains("b"))
                         {
-                            cSDRDriver.setBandWidth(cmd["b"].get<double>());
+                            // Not Implemented (BandWidth)
                         }
                         
                         if (cmd.contains("g"))
@@ -123,7 +125,7 @@ void CSDRParser::parseMessage (Json_de &andruav_message, const char * full_messa
 
                         if (cmd.contains("m"))
                         {
-                            cSDRDriver.setDecodeMode(cmd["m"].get<double>());
+                            //NOT IMPLEMENTED (Modulation)
                         }
 
                         if (cmd.contains("r"))
@@ -158,12 +160,9 @@ void CSDRParser::parseMessage (Json_de &andruav_message, const char * full_messa
                     break;
                     
 
-                    case SDR_ACTION_SCAN_SPECTRUM:
+                    case SDR_ACTION_PAUSE_DATA:
                     {
-                        #ifdef DEBUG
-                            std::cout << cmd.dump() << std::endl;
-                        #endif
-                        
+                        cSDRDriver.pauseStreaming();
                     }
                     break;
 
@@ -219,14 +218,16 @@ void CSDRParser::parseRemoteExecute (Json_de &andruav_message)
         permission =  andruav_message[ANDRUAV_PROTOCOL_MESSAGE_PERMISSION].get<int>();
     }
 
-    UNUSED (permission);
-    
     bool is_system = false;
      
     if ((validateField(andruav_message, ANDRUAV_PROTOCOL_SENDER, Json_de::value_t::string)) && (andruav_message[ANDRUAV_PROTOCOL_SENDER].get<std::string>().compare(SPECIAL_NAME_SYS_NAME)==0))
     {   // permission is not needed if this command sender is the communication server not a remote GCS or Unit.
         is_system = true;
     }
+
+    UNUSED (is_system);
+    UNUSED (permission);
+    
     const int remoteCommand = cmd["C"].get<int>();
     std::cout << "cmd: " << remoteCommand << std::endl;
     

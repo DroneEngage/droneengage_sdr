@@ -32,19 +32,14 @@ namespace sdr
 
     typedef struct rxStruct{
         double fc;
-        double f;
         double sample_rate;
         long size;
         double faudio;
-        double bw;
         
-        class cStack *cs;
         
         int audioOut;
         
-        int decode_mode;
         
-        DE_Filters fs;
         
         double gain;
         
@@ -63,19 +58,20 @@ namespace sdr
 		NOT_CONNECTED       = 0,
         CONNECTED           = 1,
 		STREAMING_ONCE      = 2,
-        STREAMING_INTERVALS  = 4,
+        STREAMING_INTERVALS  = 3,
         ERROR               = 999
 	};
 
     enum class ENUM_DECODING_MODE
 	{
-		MODE_FM         = 0,
-		MODE_NBFM       = 1,
-		MODE_AM         = 2,
-		MODE_NAM        = 3,
-		MODE_USB        = 4,
-		MODE_LSB        = 5,
-        MODE_CW         = 6
+		MODE_RAW        = 0,
+        MODE_FM         = 1,
+		MODE_NBFM       = 2,
+		MODE_AM         = 3,
+		MODE_NAM        = 4,
+		MODE_USB        = 5,
+		MODE_LSB        = 6,
+        MODE_CW         = 7,
 	};
 
 
@@ -88,23 +84,7 @@ namespace sdr
 #define NUM_DATA_BUFF 10
 
 
-    class cStack{
-    public:
-        cStack(DE_SDR_RX *rx);
-        ~cStack();
-        int pushBuffa(int nbuffer,DE_SDR_RX *rx);
-        int popBuffa(DE_SDR_RX *rx);
-        int setBuff(DE_SDR_RX *rx);
-        DE_SDR_RX *rx;    
-
-        float *buffa[NUM_ABUFF];
-        int buffStacka[NUM_ABUFF];
-
-        int bufftopa;
-        int bufftop;
-
-    };
-
+    
     /**
      * @brief 
      * 
@@ -146,6 +126,7 @@ namespace sdr
             void listDevices();
             void startStreamingOnce();
             void startStreaming();
+            void pauseStreaming();
             
             bool openSDR();
             bool closeSDR();
@@ -194,17 +175,6 @@ namespace sdr
             }
 
 
-            inline float getFrequency() const
-            {
-                return m_sdr_rx.f;
-            }
-
-            inline void setFrequency(const float frequency)
-            {
-                m_sdr_rx.f = frequency;
-            }
-
-
             inline float getSampleRate() const
             {
                 return m_sdr_rx.sample_rate;
@@ -229,23 +199,7 @@ namespace sdr
             
             inline float getDecodeMode() const
             {
-                return m_sdr_rx.decode_mode;
-            }
-
-            inline void setDecodeMode(const float decode_mode)
-            {
-                m_sdr_rx.decode_mode = decode_mode;
-            }
-
-
-            inline float getBandWidth() const
-            {
-                return m_sdr_rx.bw;
-            }
-
-            inline void setBandWidth(const float band_width)
-            {
-                m_sdr_rx.bw = band_width;
+                return static_cast<float>(ENUM_DECODING_MODE::MODE_RAW);
             }
 
             inline std::vector<SoapySDR::Kwargs> get_device_agrs() const 
@@ -259,8 +213,6 @@ namespace sdr
             void setSDRDriverByName(const std::string sdr_driver);
 
         private:
-
-            int center_fft(fftw_complex *out,int N) const;
 
             void setStatus(ENUM_STATE status);
 
@@ -277,9 +229,9 @@ namespace sdr
 
             std::string m_sdr_driver;
             int m_sdr_index = 0; 
-            float *buff1 = nullptr;
-            float *buff2 = nullptr;
-            float *buff3 = nullptr;
+            std::vector<float>buff1;
+            std::vector<float>buff2;
+            
 
             fftwf_plan p1;
             fftwf_plan p2;
