@@ -251,8 +251,15 @@
 #define TYPE_AndruavMessage_SOUND_TEXT_TO_SPEECH            6511
 #define TYPE_AndruavMessage_SOUND_PLAY_FILE                 6512
 
-
+#define TYPE_AndruavMessage_SDR_TRIGGER                     6513
+/**
+ * @brief control module
+ */
 #define TYPE_AndruavMessage_SDR_ACTION                      6514
+/**
+ * @brief report 
+ * 
+ */
 #define TYPE_AndruavMessage_SDR_STATUS                      6515
 #define TYPE_AndruavMessage_SDR_SPECTRUM                    6516
 
@@ -314,6 +321,7 @@
 #define SDR_ACTION_READ_DATA                                4
 #define SDR_ACTION_PAUSE_DATA                               5
 #define SDR_ACTION_SDR_INFO                                 6
+#define SDR_ACTION_TRIGGER                                  7
 
 // CAMERA MODULE MESSAGES
 

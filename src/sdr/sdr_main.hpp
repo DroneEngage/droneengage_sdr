@@ -18,6 +18,24 @@
 using Json_de = nlohmann::json;
 
 
+typedef struct {
+
+    int32_t latitude = 0;
+    int32_t longitude = 0;
+    int32_t altitude = std::numeric_limits<int32_t>::min();  
+    int32_t altitude_relative = std::numeric_limits<int32_t>::min(); 
+    float   air_speed = 0.0f;
+    float   ground_speed = 0.0f;
+    uint64_t last_access_time = 0;
+    uint32_t h_acc; /*< [mm] Position uncertainty.*/
+    uint32_t v_acc; /*< [mm] Altitude uncertainty.*/
+    uint32_t vel_acc; /*< [mm] Speed uncertainty.*/
+    uint16_t yaw; /*< [cdeg] Yaw in earth frame from north. Use 0 if this GPS does not provide yaw. Use 65535 if this GPS is configured to provide yaw and is currently unable to provide it. Use 36000 for north.*/
+
+    bool is_valid = false;
+    bool is_new = false;   
+} ANDRUAV_UNIT_LOCATION;
+
 namespace de
 {
 namespace sdr
@@ -80,21 +98,48 @@ namespace sdr
 
         public:
 
-            inline double getLatitude()
+
+            inline ANDRUAV_UNIT_LOCATION& getUnitLocationInfo()
             {
-                return m_latitude;
+                return m_unit_location_info;
             }
 
-            inline double getLongitude()
+
+            const inline int32_t getLatitude() const 
             {
-                return m_longitude;
+                return m_unit_location_info.latitude;
             }
 
-            inline double getLocationReportStatus()
+            const inline int32_t getLongitude() const 
+            {
+                return m_unit_location_info.longitude;
+            }
+
+            const inline int32_t getRelativeAltitude() const 
+            {
+                return m_unit_location_info.altitude_relative;
+            }
+
+            const inline int32_t getAbsoluteAltitude() const 
+            {
+                return m_unit_location_info.altitude;
+            }
+
+            const  inline double getLocationReportStatus() const 
             {
                 return m_report_static_location;
             }
+
+            const inline bool getSendingLocation () const
+            {
+                return m_sending_location;
+            }
             
+
+            const inline void setSendingLocation (const bool enable)
+            {
+                m_sending_location = enable;
+            }
 
         protected:
             void initSDRParameters();
@@ -103,6 +148,7 @@ namespace sdr
             de::sdr::CSDR_Facade& m_sdr_facade = de::sdr::CSDR_Facade::getInstance();
 
         private:
+            bool m_sending_location = true;
             bool m_exit_thread = true;
             u_int64_t m_counter =0;
             std::thread m_scheduler_thread;
@@ -112,9 +158,9 @@ namespace sdr
 
             std::string m_driver;
 
-            double m_latitude, m_longitude;
             bool m_report_static_location = false;
             
+            ANDRUAV_UNIT_LOCATION m_unit_location_info;
     };
 
 }

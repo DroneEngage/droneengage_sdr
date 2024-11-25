@@ -3,6 +3,7 @@
 #include "sdr_parser.hpp"
 #include "sdr_facade.hpp"
 #include "sdr_driver.hpp"
+#include "sdr_main.hpp"
 
 using namespace de::sdr;
 
@@ -49,6 +50,26 @@ void CSDRParser::parseMessage (Json_de &andruav_message, const char * full_messa
         {
             case TYPE_AndruavMessage_ID:
             {
+            }
+            break;
+
+            case TYPE_AndruavModule_Location_Info:
+            {
+                de::sdr::CSDRMain& cSDRMain = de::sdr::CSDRMain::getInstance(); 
+                ANDRUAV_UNIT_LOCATION&  location_info = cSDRMain.getUnitLocationInfo();
+                std::cout << andruav_message.dump() << std::endl;
+                const Json_de cmd = andruav_message[ANDRUAV_PROTOCOL_MESSAGE_CMD];
+                location_info.latitude                      = cmd["la"].get<int>();
+                location_info.longitude                     = cmd["ln"].get<int>();
+                location_info.altitude                      = cmd.contains("a")?cmd["a"].get<int>():0;
+                location_info.altitude_relative             = cmd.contains("r")?cmd["r"].get<int>():0;
+                location_info.h_acc                         = cmd.contains("ha")?cmd["ha"].get<int>():0;
+                location_info.yaw                           = cmd.contains("y")?cmd["y"].get<int>():0;
+                location_info.last_access_time              = get_time_usec();
+                location_info.is_new                        = true;
+                location_info.is_valid                      = true;
+
+                cSDRMain.setSendingLocation(false); 
             }
             break;
 
@@ -229,6 +250,7 @@ void CSDRParser::parseRemoteExecute (Json_de &andruav_message)
     UNUSED (permission);
     
     const int remoteCommand = cmd["C"].get<int>();
+    
     std::cout << "cmd: " << remoteCommand << std::endl;
     
     switch (remoteCommand)

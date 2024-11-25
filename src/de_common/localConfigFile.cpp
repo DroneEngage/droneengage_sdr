@@ -143,3 +143,12 @@ bool CLocalConfigFile::getDecimalField(const char * field , double &value) const
 
     return true;
 }
+
+bool CLocalConfigFile::getNumericField2(const char * field, int32_t &value) const 
+{
+    if (!m_ConfigJSON.contains(std::string(field))) return false;
+
+    value= m_ConfigJSON[std::string(field)].get<int>();
+
+    return true;
+}

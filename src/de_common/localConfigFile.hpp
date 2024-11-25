@@ -46,11 +46,14 @@ namespace de
             void addStringField(const char * field, const char * value);
             
             const u_int32_t getNumericField(const char * field) const ;
+            bool  getNumericField2(const char * field, int32_t &value) const;
+
             void addNumericField(const char * field, const u_int32_t & value);
 
 
             bool getDecimalField(const char * field , double &value) const;
             void addDecimalField(const char * field, const double & value);
+            
         protected:
             void ReadFile (const char * fileURL);
             void WriteFile (const char * fileURL);

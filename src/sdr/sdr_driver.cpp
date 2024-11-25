@@ -323,16 +323,16 @@ void CSDRDriver::startStreamingOnce()
         
 
         const double frequency_min = m_freq_center - 0.5 * m_sample_rate;
-        const uint64_t div = (int)m_sample_rate / m_bars;
-        const float frquency_step = static_cast<float>(m_sample_rate) / m_bars;
+        const uint64_t frequency_step_uint = (int)m_sample_rate / m_bars;
+        const float frequency_step = static_cast<float>(m_sample_rate) / m_bars;
         
         std::vector<float> output(m_bars);
         uint64_t number_of_data = 0;
-        for (long int np = 0; np < m_bars; ++np)
+        for (long int current_bar_index = 0; current_bar_index < m_bars; ++current_bar_index)
         {
             double frequency_value_sum = 0.0;
-            const long int start_index = np * div;
-            const long int end_index = start_index + div - 1;
+            const long int start_index = current_bar_index * frequency_step_uint;
+            const long int end_index = start_index + frequency_step_uint - 1;
 
             for (long int i = start_index; i <= end_index; ++i)
             {
@@ -343,13 +343,13 @@ void CSDRDriver::startStreamingOnce()
             }
 
             // Calculate average frequency value
-            double average_frequency_value = frequency_value_sum / static_cast<double>(div);
+            double average_frequency_value = frequency_value_sum / static_cast<double>(frequency_step_uint);
             output[number_of_data] = static_cast<float>(average_frequency_value);
             ++number_of_data;
 
             if ((m_trigger_level > 0) && (average_frequency_value > m_trigger_level))
             {
-                CSDR_Facade::getInstance().sendSignalAlert("", frequency_min + ((start_index + end_index) / 2 )* frquency_step, average_frequency_value);
+                CSDR_Facade::getInstance().sendSignalAlert("", frequency_min + ((start_index + end_index) / 2 ), average_frequency_value);
             }
         }
 
@@ -357,7 +357,7 @@ void CSDRDriver::startStreamingOnce()
         std::cout << "sendSpectrumResultInfo" << std::endl;
 #endif
 
-        CSDR_Facade::getInstance().sendSpectrumResultInfo("", frequency_min, frquency_step, output.size(), output.data());
+        CSDR_Facade::getInstance().sendSpectrumResultInfo("", frequency_min, frequency_step, output.size(), output.data());
         
 
         // switch back to connected state "READY"

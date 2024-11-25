@@ -77,7 +77,7 @@ void de::sdr::CSDRMain::initSDRParameters()
     }
 
 
-    if (!cLocalConfigFile.getDecimalField("lng", m_longitude))
+    if (!cLocalConfigFile.getNumericField2("lng", m_unit_location_info.longitude))
     {
                 
         const Json_de& jsonConfig = cConfigFile.GetConfigJSON();
@@ -96,11 +96,16 @@ void de::sdr::CSDRMain::initSDRParameters()
             {
                 const Json_de unit_location = sdr_config["location"];
                         
-                m_longitude = unit_location["lng"].get<double>();
-                m_latitude = unit_location["lat"].get<double>();
+                m_unit_location_info.longitude = unit_location["lng"].get<int>();
+                m_unit_location_info.latitude = unit_location["lat"].get<int>();
+                m_unit_location_info.altitude = INT32_MIN; // invalid
+                m_unit_location_info.altitude_relative = unit_location["alt"].get<int>();
+                m_unit_location_info.is_new = true;
+                m_unit_location_info.is_valid = true;
                                             
-                cLocalConfigFile.addDecimalField("lng", m_longitude);
-                cLocalConfigFile.addDecimalField("lat", m_latitude);
+                cLocalConfigFile.getNumericField2("lng", m_unit_location_info.longitude);
+                cLocalConfigFile.getNumericField2("lat", m_unit_location_info.latitude);
+                cLocalConfigFile.getNumericField2("alt", m_unit_location_info.altitude);
                 cLocalConfigFile.apply();
                 m_report_static_location = true;
             }
@@ -118,13 +123,14 @@ void de::sdr::CSDRMain::initSDRParameters()
     }
     else
     {
-        cLocalConfigFile.getDecimalField("lat", m_latitude);
+        cLocalConfigFile.getNumericField2("lat", m_unit_location_info.latitude);
+        cLocalConfigFile.getNumericField2("alt", m_unit_location_info.altitude);
         m_report_static_location = true;
     }
     
     
     std::cout << _LOG_CONSOLE_BOLD_TEXT << "SDR Driver: " << _INFO_CONSOLE_TEXT << m_driver << _NORMAL_CONSOLE_TEXT_ << std::endl;
-    std::cout << _LOG_CONSOLE_BOLD_TEXT << "Location (lng,lat): " << _INFO_CONSOLE_TEXT << std::to_string(m_longitude) << "," << std::to_string(m_latitude) << _NORMAL_CONSOLE_TEXT_ << std::endl;
+    std::cout << _LOG_CONSOLE_BOLD_TEXT << "Location (lng,lat): " << _INFO_CONSOLE_TEXT << std::to_string(m_unit_location_info.longitude) << "," << std::to_string(m_unit_location_info.latitude) << _NORMAL_CONSOLE_TEXT_ << std::endl;
     
 }
 

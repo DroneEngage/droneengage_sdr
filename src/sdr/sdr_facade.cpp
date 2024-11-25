@@ -34,7 +34,7 @@ void CSDR_Facade::API_SDRInfo(const std::string&target_party_id) const
         std::cout << "XXXXXXXXXXXXXXXXXXXXX" << jMsg.dump() << std::endl;
     #endif
     
-    m_module.sendJMSG (target_party_id, jMsg, TYPE_AndruavMessage_SDR_STATUS,  false);
+    m_module.sendJMSG (target_party_id, jMsg, TYPE_AndruavMessage_SDR_ACTION,  false);
     
 }
 
@@ -79,9 +79,44 @@ void CSDR_Facade::API_SendSDRDrivers (const std::string& target_party_id) const
             {"dr", drivers_array},
         };
 
-    m_module.sendJMSG (target_party_id, jMsg, TYPE_AndruavMessage_SDR_STATUS,  false);
+    m_module.sendJMSG (target_party_id, jMsg, TYPE_AndruavMessage_SDR_ACTION,  false);
 }
-            
+
+
+void CSDR_Facade::sendSignalAlert(const std::string&target_party_id, const double frequency, const double frequency_signal_value)
+{
+    /*
+        la          : latitude   [degE7]
+        ln          : longitude  [degE7]
+        a           : absolute altitude
+        r           : relative altitude
+    */
+    
+    de::sdr::CSDRMain& cSDRMain = de::sdr::CSDRMain::getInstance();
+
+    ANDRUAV_UNIT_LOCATION& location_info = cSDRMain.getUnitLocationInfo();
+
+    Json_de message=
+    {
+        {"a", SDR_ACTION_TRIGGER},
+        {"la", cSDRMain.getLatitude() },        // latitude   [degE7]
+        {"ln", cSDRMain.getLongitude()},        // longitude  [degE7]
+        {"r", frequency},                       // frequency
+        {"v", frequency_signal_value}           // frequency signal value
+        
+    };
+
+    if (location_info.is_valid && (location_info.altitude != INT32_MIN)) 
+    {
+        message["A"] = location_info.altitude;
+    }
+
+#ifdef DEBUG
+    std::cout <<  "SDR_ACTION_TRIGGER:" << std::to_string(frequency) << std::endl;
+#endif
+
+    m_module.sendJMSG (target_party_id, message, TYPE_AndruavMessage_SDR_ACTION, false);
+}
 
 void CSDR_Facade::sendLocationInfo (const std::string&target_party_id) const 
 {
@@ -94,13 +129,15 @@ void CSDR_Facade::sendLocationInfo (const std::string&target_party_id) const
     
     de::sdr::CSDRMain& cSDRMain = de::sdr::CSDRMain::getInstance();
 
+    if (!cSDRMain.getSendingLocation()) return ;
+
     Json_de message=
     {
-        {"la", cSDRMain.getLatitude()},         // latitude   [degE7]
-        {"ln", cSDRMain.getLongitude()},        // longitude  [degE7]
-        {"a", 0},                               // absolute altitude in mm
-        {"r", 0},                               // relative altitude in mm
-        {"y", 0},                               // yaw in cdeg
+        {"la", cSDRMain.getLatitude() * 1e-7},          // latitude   [degE7]
+        {"ln", cSDRMain.getLongitude() * 1e-7},         // longitude  [degE7]
+        {"a",  cSDRMain.getAbsoluteAltitude()==INT32_MIN?0:cSDRMain.getAbsoluteAltitude() * 0.001},         // absolute altitude in mm
+        {"r",  cSDRMain.getRelativeAltitude()==INT32_MIN?0:cSDRMain.getRelativeAltitude() * 0.001},         // relative altitude in mm
+        {"y", 0},                                       // yaw in cdeg
         {"3D",0},
         {"SC",0},
         {"p",0}
@@ -124,27 +161,6 @@ void CSDR_Facade::sendSpectrumResultInfo (const std::string&target_party_id, con
 }
 
 
-void CSDR_Facade::sendSignalAlert(const std::string&target_party_id, const double frequency, const double frequency_signal_value)
-{
-    /*
-        la          : latitude   [degE7]
-        ln          : longitude  [degE7]
-        a           : absolute altitude
-        r           : relative altitude
-    */
-    
-    de::sdr::CSDRMain& cSDRMain = de::sdr::CSDRMain::getInstance();
 
-    Json_de message=
-    {
-        {"la", cSDRMain.getLatitude()},         // latitude   [degE7]
-        {"ln", cSDRMain.getLongitude()},        // longitude  [degE7]
-        {"r", frequency},                       // frequency
-        {"a", frequency_signal_value}           // frequency signal value
-        
-    };
-
-    m_module.sendJMSG (target_party_id, message, TYPE_AndruavMessage_GPS, false);
-}
         
 
