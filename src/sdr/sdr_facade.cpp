@@ -99,16 +99,22 @@ void CSDR_Facade::sendSignalAlert(const std::string&target_party_id, const doubl
     Json_de message=
     {
         {"a", SDR_ACTION_TRIGGER},
-        {"la", cSDRMain.getLatitude() },        // latitude   [degE7]
-        {"ln", cSDRMain.getLongitude()},        // longitude  [degE7]
-        {"r", frequency},                       // frequency
+        
+        {"la", location_info.latitude  * 1e-7},        // latitude   [degE7]
+        {"ln", location_info.longitude  * 1e-7},        // longitude  [degE7]
+        // {"d",  },                               // signal diretion [null = omni]
+        {"f", frequency},                       // frequency
         {"v", frequency_signal_value}           // frequency signal value
         
     };
 
     if (location_info.is_valid && (location_info.altitude != INT32_MIN)) 
     {
-        message["A"] = location_info.altitude;
+        message["A"] = location_info.altitude * 0.001;
+    }
+    if (location_info.is_valid && (location_info.altitude_relative != INT32_MIN)) 
+    {
+        message["r"] = location_info.altitude_relative * 0.001;
     }
 
 #ifdef DEBUG
@@ -135,8 +141,8 @@ void CSDR_Facade::sendLocationInfo (const std::string&target_party_id) const
     {
         {"la", cSDRMain.getLatitude() * 1e-7},          // latitude   [degE7]
         {"ln", cSDRMain.getLongitude() * 1e-7},         // longitude  [degE7]
-        {"a",  cSDRMain.getAbsoluteAltitude()==INT32_MIN?0:cSDRMain.getAbsoluteAltitude() * 0.001},         // absolute altitude in mm
-        {"r",  cSDRMain.getRelativeAltitude()==INT32_MIN?0:cSDRMain.getRelativeAltitude() * 0.001},         // relative altitude in mm
+        {"a",  cSDRMain.getAbsoluteAltitude()==INT32_MIN?0:cSDRMain.getAbsoluteAltitude() * 0.001},         // absolute altitude in mm to meter
+        {"r",  cSDRMain.getRelativeAltitude()==INT32_MIN?0:cSDRMain.getRelativeAltitude() * 0.001},         // relative altitude in mm to meter
         {"y", 0},                                       // yaw in cdeg
         {"3D",0},
         {"SC",0},
