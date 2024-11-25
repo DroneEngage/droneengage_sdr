@@ -23,7 +23,6 @@ using namespace de;
 #define MESSAGE_FILTER {TYPE_AndruavMessage_ID, \
                         TYPE_AndruavMessage_RemoteExecute, \
                         TYPE_AndruavMessage_Error, \
-                        TYPE_AndruavMessage_SDR_INFO, \
                         TYPE_AndruavMessage_SDR_ACTION, \
                         TYPE_AndruavMessage_SDR_STATUS, \
                         TYPE_AndruavMessage_Upload_DE_Mission, \

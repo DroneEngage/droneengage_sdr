@@ -251,7 +251,7 @@
 #define TYPE_AndruavMessage_SOUND_TEXT_TO_SPEECH            6511
 #define TYPE_AndruavMessage_SOUND_PLAY_FILE                 6512
 
-#define TYPE_AndruavMessage_SDR_INFO                        6513
+
 #define TYPE_AndruavMessage_SDR_ACTION                      6514
 #define TYPE_AndruavMessage_SDR_STATUS                      6515
 #define TYPE_AndruavMessage_SDR_SPECTRUM                    6516
@@ -313,7 +313,7 @@
 #define SDR_ACTION_SET_CONFIG                               3
 #define SDR_ACTION_READ_DATA                                4
 #define SDR_ACTION_PAUSE_DATA                               5
-
+#define SDR_ACTION_SDR_INFO                                 6
 
 // CAMERA MODULE MESSAGES
 

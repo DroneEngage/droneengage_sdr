@@ -7,7 +7,7 @@
 using namespace de::sdr;
 
 
-std::thread g;
+
 
 /// @brief Parses & executes messages received from uavos_comm"
 /// @param parsed JSON message received from uavos_comm 
@@ -108,11 +108,6 @@ void CSDRParser::parseMessage (Json_de &andruav_message, const char * full_messa
                             cSDRDriver.setFrequencyCenter(cmd["fc"].get<double>());
                         }
 
-                        if (cmd.contains("b"))
-                        {
-                            // Not Implemented (BandWidth)
-                        }
-                        
                         if (cmd.contains("g"))
                         {
                             cSDRDriver.setGain(cmd["g"].get<double>());
@@ -143,6 +138,16 @@ void CSDRParser::parseMessage (Json_de &andruav_message, const char * full_messa
                         }
 
 
+                        if (validateField(cmd, "l", Json_de::value_t::number_unsigned))
+                        {   // milli-seconds
+                            cSDRDriver.setTriggerLevel(cmd["l"].get<int>()); 
+                        }
+                        else
+                        {
+                            cSDRDriver.setTriggerLevel(0);
+                        }
+
+
                         // broadcast updated info.
                         CSDRDriver::getInstance().openSDR();
 
@@ -153,9 +158,10 @@ void CSDRParser::parseMessage (Json_de &andruav_message, const char * full_messa
 
                     case SDR_ACTION_READ_DATA:
                     {
-                        g = std::thread {[&](){ 
-                                cSDRDriver.startStreaming();
-                                g.detach();}};
+                        // Create a new thread and detach it immediately
+                        std::thread([&]() { 
+                            cSDRDriver.startStreaming(); 
+                        }).detach(); // Detach the thread right after creation
                     }
                     break;
                     
@@ -172,12 +178,6 @@ void CSDRParser::parseMessage (Json_de &andruav_message, const char * full_messa
                     }
                     break;
                 }
-            }
-            break;
-
-            case TYPE_AndruavMessage_SDR_STATUS:
-            {
-                //SDR_ACTION_SET_CONFIG
             }
             break;
 
@@ -233,16 +233,15 @@ void CSDRParser::parseRemoteExecute (Json_de &andruav_message)
     
     switch (remoteCommand)
     {
-        case TYPE_AndruavMessage_SDR_INFO:
-            CSDR_Facade::getInstance().API_SDRInfo(andruav_message[ANDRUAV_PROTOCOL_SENDER].get<std::string>());
-        break;
-
         case TYPE_AndruavMessage_SDR_ACTION:
         {
             const int subCommand = cmd["a"].get<int>();
 
             switch (subCommand)
             {
+                case SDR_ACTION_SDR_INFO:
+                    CSDR_Facade::getInstance().API_SDRInfo(andruav_message[ANDRUAV_PROTOCOL_SENDER].get<std::string>());
+                    break;
                 case SDR_ACTION_LIST_SDR_DEVICES:
                     CSDR_Facade::getInstance().API_SendSDRDrivers(andruav_message[ANDRUAV_PROTOCOL_SENDER].get<std::string>());
                     break;
@@ -253,7 +252,6 @@ void CSDRParser::parseRemoteExecute (Json_de &andruav_message)
         }
         break;
 
-        case TYPE_AndruavMessage_SDR_STATUS:
-        break;
+        
     }
 }

@@ -18,6 +18,7 @@ void CSDR_Facade::API_SDRInfo(const std::string&target_party_id) const
     
     Json_de jMsg = 
         {
+            {"a", SDR_ACTION_SDR_INFO},
             {"c" , cSDRDriver.getStatus()},
             {"fc", cSDRDriver.getFrequencyCenter()},
             {"s" , cSDRDriver.getSampleRate()},
@@ -25,14 +26,15 @@ void CSDR_Facade::API_SDRInfo(const std::string&target_party_id) const
             {"m" , cSDRDriver.getDecodeMode()},
             {"i" , cSDRDriver.getSDRDriverIndex()},
             {"r" , cSDRDriver.getBars()},
-            {"t" , cSDRDriver.getIntervals()}
+            {"t" , cSDRDriver.getIntervals()},
+            {"l" , cSDRDriver.getTriggerLevel()}
         };
 
     #ifdef DDEBUG
         std::cout << "XXXXXXXXXXXXXXXXXXXXX" << jMsg.dump() << std::endl;
     #endif
     
-    m_module.sendJMSG (target_party_id, jMsg, TYPE_AndruavMessage_SDR_INFO,  false);
+    m_module.sendJMSG (target_party_id, jMsg, TYPE_AndruavMessage_SDR_STATUS,  false);
     
 }
 
@@ -120,4 +122,29 @@ void CSDR_Facade::sendSpectrumResultInfo (const std::string&target_party_id, con
         
     m_module.sendBMSG ("", (char *)result, number_of_data * sizeof(float), TYPE_AndruavMessage_SDR_SPECTRUM, false, msg_cmd);
 }
+
+
+void CSDR_Facade::sendSignalAlert(const std::string&target_party_id, const double frequency, const double frequency_signal_value)
+{
+    /*
+        la          : latitude   [degE7]
+        ln          : longitude  [degE7]
+        a           : absolute altitude
+        r           : relative altitude
+    */
+    
+    de::sdr::CSDRMain& cSDRMain = de::sdr::CSDRMain::getInstance();
+
+    Json_de message=
+    {
+        {"la", cSDRMain.getLatitude()},         // latitude   [degE7]
+        {"ln", cSDRMain.getLongitude()},        // longitude  [degE7]
+        {"r", frequency},                       // frequency
+        {"a", frequency_signal_value}           // frequency signal value
+        
+    };
+
+    m_module.sendJMSG (target_party_id, message, TYPE_AndruavMessage_GPS, false);
+}
+        
 

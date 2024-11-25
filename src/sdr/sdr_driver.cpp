@@ -27,13 +27,11 @@ void CSDRDriver::setStatus(ENUM_STATE status)
 bool CSDRDriver::init()
 {
 
-    m_sdr_rx.gain = 50.0;
+    m_gain = 50.0;
 
-    m_sdr_rx.fc = 100.3e6;
+    m_freq_center = 100.3e6;
 
-    m_sdr_rx.sample_rate = 1.3e6;
-
-    m_sdr_rx.faudio = 48000;
+    m_sample_rate = 1.3e6;
 
     return true;
 }
@@ -46,7 +44,7 @@ void CSDRDriver::listDevices()
 
     m_device_args = SoapySDR::Device::enumerate();
 
-    fprintf(stderr, "Number of SDR Devices Found: %ld\n", (long)m_device_args.size());
+    std::cout << "Number of SDR Devices Found: " << (long)m_device_args.size() << std::endl;
 
     if (m_device_args.size() < 1)
         return;
@@ -213,25 +211,25 @@ bool CSDRDriver::openSDR()
     setStatus(ENUM_STATE::CONNECTED);
     cSDR_Facade.sendErrorMessage(std::string(), 0, ERROR_TYPE_ERROR_P2P, NOTIFICATION_TYPE_INFO, "SDR is Active.");
 
-    m_sdr->setFrequency(SOAPY_SDR_RX, 0, "RF", m_sdr_rx.fc);
+    m_sdr->setFrequency(SOAPY_SDR_RX, 0, "RF", m_freq_center);
 
 #ifdef DDEBUG
-    std::cout << "m_sdr_rx.fc:" << m_sdr_rx.fc << std::endl;
+    std::cout << "m_freq_center:" << m_freq_center << std::endl;
 #endif
 
-    m_sdr->setSampleRate(SOAPY_SDR_RX, 0, m_sdr_rx.sample_rate);
+    m_sdr->setSampleRate(SOAPY_SDR_RX, 0, m_sample_rate);
 
 #ifdef DDEBUG
-    std::cout << "m_sdr_rx.sample_rate:" << m_sdr_rx.sample_rate << std::endl;
+    std::cout << "m_sample_rate:" << m_sample_rate << std::endl;
 #endif
 
-    m_sdr->setGain(SOAPY_SDR_RX, 0, m_sdr_rx.gain);
+    m_sdr->setGain(SOAPY_SDR_RX, 0, m_gain);
 
 #ifdef DDEBUG
-    std::cout << "m_sdr_rx.gain:" << m_sdr_rx.gain << std::endl;
+    std::cout << "m_gain:" << m_gain << std::endl;
 #endif
 
-    m_sdr_rx.size = m_sdr_rx.sample_rate / 20;
+    m_size = m_sample_rate / 20;
 
     m_rxStream = m_sdr->setupStream(SOAPY_SDR_RX, SOAPY_SDR_CF32, {});
 
@@ -247,8 +245,8 @@ bool CSDRDriver::openSDR()
     std::cout << "MCU: " << m_max_tx_unit << std::endl;
 
     // Allocate buffers for FFT
-    buff1 = std::vector<float> ((int)m_sdr_rx.sample_rate * 2);// new float[(int)m_sdr_rx.sample_rate * 2];
-    buff2 = std::vector<float> ((int)m_sdr_rx.sample_rate * 2);// new float[(int)m_sdr_rx.sample_rate * 2];
+    buff1 = std::vector<float> ((int)m_sample_rate * 2);// new float[(int)m_sample_rate * 2];
+    buff2 = std::vector<float> ((int)m_sample_rate * 2);// new float[(int)m_sample_rate * 2];
 
     /**
      *      EXAMPLE: p1 = fftwf_plan_dft_1d(n, in, out, FFTW_ESTIMATE);
@@ -256,9 +254,9 @@ bool CSDRDriver::openSDR()
      * out is the output array (frequency-domain signal), 
      * and FFTW_ESTIMATE is a flag that tells FFTW to use a simple, fast strategy for planning.
      */
-    p1 = fftwf_plan_dft_1d(m_sdr_rx.sample_rate, (fftwf_complex *)buff1.data(), (fftwf_complex *)buff2.data(), FFTW_FORWARD, FFTW_ESTIMATE);
+    p1 = fftwf_plan_dft_1d(m_sample_rate, (fftwf_complex *)buff1.data(), (fftwf_complex *)buff2.data(), FFTW_FORWARD, FFTW_ESTIMATE);
 
-    std::cout << _SUCCESS_CONSOLE_BOLD_TEXT_ << "Initialized SDR with sample rate: " << m_sdr_rx.sample_rate << _NORMAL_CONSOLE_TEXT_ << std::endl;
+    std::cout << _SUCCESS_CONSOLE_BOLD_TEXT_ << "Initialized SDR with sample rate: " << m_sample_rate << _NORMAL_CONSOLE_TEXT_ << std::endl;
 
     return true;
 }
@@ -281,7 +279,7 @@ void CSDRDriver::startStreamingOnce()
         float *out;
         int flags = 0;
         long long timeNs = 0;
-        int rec = m_sdr_rx.sample_rate; // Total number of samples to read
+        int rec = m_sample_rate; // Total number of samples to read
         uint numElems;
         out = buff1.data();
 
@@ -324,14 +322,13 @@ void CSDRDriver::startStreamingOnce()
 
         
 
-        const double frequency_min = m_sdr_rx.fc - 0.5 * m_sdr_rx.sample_rate;
-        const uint64_t div = (int)m_sdr_rx.sample_rate / m_bars;
-        const float frquency_step = static_cast<float>(m_sdr_rx.sample_rate) / m_bars;
-        const long int num_output_points = m_sdr_rx.sample_rate / div;
-
-        std::vector<float> output(num_output_points);
+        const double frequency_min = m_freq_center - 0.5 * m_sample_rate;
+        const uint64_t div = (int)m_sample_rate / m_bars;
+        const float frquency_step = static_cast<float>(m_sample_rate) / m_bars;
+        
+        std::vector<float> output(m_bars);
         uint64_t number_of_data = 0;
-        for (long int np = 0; np < num_output_points; ++np)
+        for (long int np = 0; np < m_bars; ++np)
         {
             double frequency_value_sum = 0.0;
             const long int start_index = np * div;
@@ -340,9 +337,9 @@ void CSDRDriver::startStreamingOnce()
             for (long int i = start_index; i <= end_index; ++i)
             {
                 const long int index = i * 2;
-                double frequency_value = hypot(buff2[index], buff2[index + 1]); // Magnitude
+                const double frequency_value = hypot(buff2[index], buff2[index + 1]); // Magnitude
                 frequency_value_sum += frequency_value;
-                //double frequency = frequency_min + i; // Calculate the actual frequency
+                
             }
 
             // Calculate average frequency value
@@ -350,6 +347,10 @@ void CSDRDriver::startStreamingOnce()
             output[number_of_data] = static_cast<float>(average_frequency_value);
             ++number_of_data;
 
+            if ((m_trigger_level > 0) && (average_frequency_value > m_trigger_level))
+            {
+                CSDR_Facade::getInstance().sendSignalAlert("", frequency_min + ((start_index + end_index) / 2 )* frquency_step, average_frequency_value);
+            }
         }
 
 #ifdef DEBUG

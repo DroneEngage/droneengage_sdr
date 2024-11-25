@@ -73,7 +73,9 @@
         "valarray": "cpp",
         "variant": "cpp",
         "rtaudio.h": "c",
-        "liquid.h": "c"
+        "liquid.h": "c",
+        "format": "cpp",
+        "future": "cpp"
     },
     "stm32-for-vscode.openOCDPath": false
 }

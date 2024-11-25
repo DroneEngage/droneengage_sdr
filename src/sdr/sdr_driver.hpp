@@ -31,17 +31,9 @@ namespace sdr
 
 
     typedef struct rxStruct{
-        double fc;
-        double sample_rate;
-        long size;
-        double faudio;
-        
-        
-        int audioOut;
         
         
         
-        double gain;
         
         int iprint;
         
@@ -164,36 +156,46 @@ namespace sdr
                 m_intervals = intervals;
             }
 
+            inline uint64_t getTriggerLevel() const
+            {
+                return m_trigger_level;
+            }
+
+            inline void setTriggerLevel(const uint64_t trigger_level)
+            {
+                m_trigger_level = trigger_level;
+            }
+
             inline float getFrequencyCenter() const
             {
-                return m_sdr_rx.fc;
+                return m_freq_center;
             }
 
             inline void setFrequencyCenter(const float frequency_center)
             {
-                m_sdr_rx.fc = frequency_center;
+                m_freq_center = frequency_center;
             }
 
 
             inline float getSampleRate() const
             {
-                return m_sdr_rx.sample_rate;
+                return m_sample_rate;
             }
 
             inline void setSampleRate(const float sample_rate)
             {
-                m_sdr_rx.sample_rate = sample_rate;
+                m_sample_rate = sample_rate;
             }
 
 
             inline float getGain() const
             {
-                return m_sdr_rx.gain;
+                return m_gain;
             }
 
             inline void setGain(const float gain)
             {
-                m_sdr_rx.gain = gain;
+                m_gain = gain;
             }
 
             
@@ -220,7 +222,6 @@ namespace sdr
 
         private:
 
-            DE_SDR_RX m_sdr_rx;
             std::vector<SoapySDR::Kwargs> m_device_args;
             SoapySDR::Device *m_sdr = NULL;
             SoapySDR::Stream *m_rxStream = NULL;
@@ -237,8 +238,13 @@ namespace sdr
             fftwf_plan p2;
             size_t m_max_tx_unit;
 
+            long m_size;
             uint64_t m_bars = 32;
+            double m_freq_center;
+            double m_gain;
+            double m_sample_rate;
             uint64_t m_intervals = 0; // no interval
+            uint64_t m_trigger_level = 0; // no trigger
             bool m_exit = false;
 
             std::mutex m_lock;
