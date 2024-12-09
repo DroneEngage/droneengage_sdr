@@ -4,17 +4,11 @@
 
 ![Drone Engage Mavlink Module](resources/de_logo_title.png) 
 
-#Drone Engage SDR Module
-
-# What is DE-SDR ?
+# Drone Engage SDR Module
 
 DroneEngage-SDR is a Drone Engage plugin module that enables DroneEngage to control SDR hardware for signal scanning and detection.
 
 The plugin is a proof-of-concept of how DroneEngage can be extended to inlcude varaities of sensors and devices and performs different functions.
-
-Drone Mavlink is the most important [Drone-Engage](https://cloud.ardupilot.org "Drone-Engage") plugin.
-
-[Raspberry-pi boards to run Drone-Engage](https://cloud.ardupilot.org/_images/setup1.png "Raspberry-pi boards to run Drone-Engage")
 
 [![WebClient-SDR](https://github.com/DroneEngage/droneengage_sdr/blob/master/resources/webclient_sdr.png?raw=true "WebClient-SDR")](https://github.com/DroneEngage/droneengage_sdr/blob/master/resources/webclient_sdr.png?raw=true "WebClient-SDR")
 
