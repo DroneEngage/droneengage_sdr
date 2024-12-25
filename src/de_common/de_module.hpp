@@ -28,6 +28,7 @@ typedef enum {
 #define MODULE_CLASS_P2P                        "p2p"
 #define MODULE_CLASS_GENERIC                    "gen"
 #define MODULE_CLASS_SDR                        "sdr"
+#define MODULE_CLASS_GPIO                        "gpio"
 
 
 

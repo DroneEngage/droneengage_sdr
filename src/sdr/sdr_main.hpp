@@ -150,7 +150,7 @@ namespace sdr
         private:
             bool m_sending_location = true;
             bool m_exit_thread = true;
-            u_int64_t m_counter =0;
+            u_int64_t m_counter = 0;
             std::thread m_scheduler_thread;
 
             std::string m_party_id;

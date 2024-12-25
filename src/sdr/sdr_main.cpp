@@ -154,5 +154,10 @@ bool de::sdr::CSDRMain::init()
 
 bool de::sdr::CSDRMain::uninit()
 {
+    m_exit_thread = true;
+
+    // Wait for the thread to finish
+    m_scheduler_thread.join();
+    
     return true;
 }
