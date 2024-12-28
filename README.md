@@ -2,7 +2,7 @@
 
 ------------
 
-![Drone Engage Mavlink Module](resources/de_logo_title.png) 
+![Drone Engage SDR Module](resources/de_logo_title.png) 
 
 # Drone Engage SDR Module
 
