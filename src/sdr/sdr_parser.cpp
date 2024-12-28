@@ -75,7 +75,7 @@ void CSDRParser::parseMessage (Json_de &andruav_message, const char * full_messa
 
             case TYPE_AndruavMessage_SDR_ACTION:
             {
-/**
+                /**
                 * @brief This is a general purpose message 
                 * 
                 * a: P2P_ACTION_ ... commands
@@ -202,6 +202,25 @@ void CSDRParser::parseMessage (Json_de &andruav_message, const char * full_messa
             }
             break;
 
+            case TYPE_AndruavMessage_SDR_REMOTE_EXECUTE:
+            {
+                const int subCommand = cmd["a"].get<int>();
+
+                switch (subCommand)
+                {
+                    case SDR_ACTION_SDR_INFO:
+                        CSDR_Facade::getInstance().API_SDRInfo(andruav_message[ANDRUAV_PROTOCOL_SENDER].get<std::string>());
+                        break;
+                    case SDR_ACTION_LIST_SDR_DEVICES:
+                        CSDR_Facade::getInstance().API_SendSDRDrivers(andruav_message[ANDRUAV_PROTOCOL_SENDER].get<std::string>());
+                        break;
+                    
+                    default:
+                        break;
+                }
+            }
+            break;
+
             case TYPE_AndruavMessage_Upload_DE_Mission:
             {
 
@@ -229,51 +248,51 @@ void CSDRParser::parseMessage (Json_de &andruav_message, const char * full_messa
  */
 void CSDRParser::parseRemoteExecute (Json_de &andruav_message)
 {
-    const Json_de cmd = andruav_message[ANDRUAV_PROTOCOL_MESSAGE_CMD];
+    // const Json_de cmd = andruav_message[ANDRUAV_PROTOCOL_MESSAGE_CMD];
     
-    if (!validateField(cmd, "C", Json_de::value_t::number_unsigned)) return ;
+    // if (!validateField(cmd, "C", Json_de::value_t::number_unsigned)) return ;
                 
-    uint32_t permission = 0;
-    if (validateField(andruav_message, ANDRUAV_PROTOCOL_MESSAGE_PERMISSION, Json_de::value_t::number_unsigned))
-    {
-        permission =  andruav_message[ANDRUAV_PROTOCOL_MESSAGE_PERMISSION].get<int>();
-    }
+    // uint32_t permission = 0;
+    // if (validateField(andruav_message, ANDRUAV_PROTOCOL_MESSAGE_PERMISSION, Json_de::value_t::number_unsigned))
+    // {
+    //     permission =  andruav_message[ANDRUAV_PROTOCOL_MESSAGE_PERMISSION].get<int>();
+    // }
 
-    bool is_system = false;
+    // bool is_system = false;
      
-    if ((validateField(andruav_message, ANDRUAV_PROTOCOL_SENDER, Json_de::value_t::string)) && (andruav_message[ANDRUAV_PROTOCOL_SENDER].get<std::string>().compare(SPECIAL_NAME_SYS_NAME)==0))
-    {   // permission is not needed if this command sender is the communication server not a remote GCS or Unit.
-        is_system = true;
-    }
+    // if ((validateField(andruav_message, ANDRUAV_PROTOCOL_SENDER, Json_de::value_t::string)) && (andruav_message[ANDRUAV_PROTOCOL_SENDER].get<std::string>().compare(SPECIAL_NAME_SYS_NAME)==0))
+    // {   // permission is not needed if this command sender is the communication server not a remote GCS or Unit.
+    //     is_system = true;
+    // }
 
-    UNUSED (is_system);
-    UNUSED (permission);
+    // UNUSED (is_system);
+    // UNUSED (permission);
     
-    const int remoteCommand = cmd["C"].get<int>();
+    // const int remoteCommand = cmd["C"].get<int>();
     
-    std::cout << "cmd: " << remoteCommand << std::endl;
+    // std::cout << "cmd: " << remoteCommand << std::endl;
     
-    switch (remoteCommand)
-    {
-        case TYPE_AndruavMessage_SDR_ACTION:
-        {
-            const int subCommand = cmd["a"].get<int>();
+    // switch (remoteCommand)
+    // {
+    //     case TYPE_AndruavMessage_SDR_ACTION:
+    //     {
+    //         const int subCommand = cmd["a"].get<int>();
 
-            switch (subCommand)
-            {
-                case SDR_ACTION_SDR_INFO:
-                    CSDR_Facade::getInstance().API_SDRInfo(andruav_message[ANDRUAV_PROTOCOL_SENDER].get<std::string>());
-                    break;
-                case SDR_ACTION_LIST_SDR_DEVICES:
-                    CSDR_Facade::getInstance().API_SendSDRDrivers(andruav_message[ANDRUAV_PROTOCOL_SENDER].get<std::string>());
-                    break;
+    //         switch (subCommand)
+    //         {
+    //             case SDR_ACTION_SDR_INFO:
+    //                 CSDR_Facade::getInstance().API_SDRInfo(andruav_message[ANDRUAV_PROTOCOL_SENDER].get<std::string>());
+    //                 break;
+    //             case SDR_ACTION_LIST_SDR_DEVICES:
+    //                 CSDR_Facade::getInstance().API_SendSDRDrivers(andruav_message[ANDRUAV_PROTOCOL_SENDER].get<std::string>());
+    //                 break;
                 
-                default:
-                    break;
-            }
-        }
-        break;
+    //             default:
+    //                 break;
+    //         }
+    //     }
+    //     break;
 
         
-    }
+    // }
 }

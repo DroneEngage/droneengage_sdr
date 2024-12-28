@@ -260,7 +260,7 @@
  * @brief report 
  * 
  */
-#define TYPE_AndruavMessage_SDR_STATUS                      6515
+#define TYPE_AndruavMessage_SDR_REMOTE_EXECUTE              6515
 #define TYPE_AndruavMessage_SDR_SPECTRUM                    6516
 
 
