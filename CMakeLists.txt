@@ -27,7 +27,7 @@ message( FATAL_ERROR “In-source builds not allowed! Create a build directory a
 exit(1)
 endif()
 
-SET (__APP__VERSION__ "1.0.0")
+SET (__APP__VERSION__ "1.0.1")
 add_definitions( -D__APP__VERSION__="${__APP__VERSION__}")
 project(DE_SDR VERSION ${__APP__VERSION__})
 
@@ -121,7 +121,6 @@ target_link_libraries(OUTPUT_BINARY
 set_target_properties( OUTPUT_BINARY 
                 PROPERTIES 
                     OUTPUT_NAME "de_sdr"
-                    SUFFIX ".so"
                 )
 
 
