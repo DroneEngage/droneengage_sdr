@@ -1,5 +1,6 @@
 #include "../global.hpp"
-#include "../helpers/helpers.hpp"
+#include "../defines.hpp"
+#include "../de_common/helpers/helpers.hpp"
 #include "sdr_parser.hpp"
 #include "sdr_facade.hpp"
 #include "sdr_driver.hpp"

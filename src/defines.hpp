@@ -1,9 +1,14 @@
 #ifndef DEFINES_H_
 #define DEFINES_H_
 
-#include <limits> 
+#include <limits>
 #include <string>
 #include <stdint.h>
+
+// SDR-module-specific constants removed from de_common messages.hpp/de_module.hpp
+#define MODULE_CLASS_SDR                        "sdr"
+#define TYPE_AndruavMessage_SDR_TRIGGER         6513
+#define SPECIAL_NAME_SYS_NAME                   "_SYS_"
 
 enum ANDRUAV_UNIT_P2P_TYPE 
 {   

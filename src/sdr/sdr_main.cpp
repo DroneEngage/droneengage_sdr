@@ -1,9 +1,9 @@
-#include "../helpers/colors.hpp"
-#include "../helpers/helpers.hpp"
+#include "../de_common/helpers/colors.hpp"
+#include "../de_common/helpers/helpers.hpp"
 
 #include "../defines.hpp"
-#include "../de_common/configFile.hpp"
-#include "../de_common/localConfigFile.hpp"
+#include "../de_common/de_databus/configFile.hpp"
+#include "../de_common/de_databus/localConfigFile.hpp"
 #include "sdr_main.hpp"
 #include "sdr_facade.hpp"
 #include "sdr_driver.hpp"
@@ -77,7 +77,8 @@ void de::sdr::CSDRMain::initSDRParameters()
     }
 
 
-    if (!cLocalConfigFile.getNumericField2("lng", m_unit_location_info.longitude))
+    const u_int32_t lng = cLocalConfigFile.getNumericField("lng");
+    if (lng == 0xffffffff)
     {
                 
         const Json_de& jsonConfig = cConfigFile.GetConfigJSON();
@@ -103,9 +104,9 @@ void de::sdr::CSDRMain::initSDRParameters()
                 m_unit_location_info.is_new = true;
                 m_unit_location_info.is_valid = true;
                                             
-                cLocalConfigFile.getNumericField2("lng", m_unit_location_info.longitude);
-                cLocalConfigFile.getNumericField2("lat", m_unit_location_info.latitude);
-                cLocalConfigFile.getNumericField2("alt", m_unit_location_info.altitude);
+                cLocalConfigFile.addNumericField("lng", (const u_int32_t&)m_unit_location_info.longitude);
+                cLocalConfigFile.addNumericField("lat", (const u_int32_t&)m_unit_location_info.latitude);
+                cLocalConfigFile.addNumericField("alt", (const u_int32_t&)m_unit_location_info.altitude);
                 cLocalConfigFile.apply();
                 m_report_static_location = true;
             }
@@ -123,8 +124,9 @@ void de::sdr::CSDRMain::initSDRParameters()
     }
     else
     {
-        cLocalConfigFile.getNumericField2("lat", m_unit_location_info.latitude);
-        cLocalConfigFile.getNumericField2("alt", m_unit_location_info.altitude);
+        m_unit_location_info.longitude = lng;
+        m_unit_location_info.latitude = cLocalConfigFile.getNumericField("lat");
+        m_unit_location_info.altitude = cLocalConfigFile.getNumericField("alt");
         m_report_static_location = true;
     }
     

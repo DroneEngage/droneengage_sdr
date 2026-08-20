@@ -1,6 +1,6 @@
 #include "../defines.hpp"
 
-#include "../helpers/helpers.hpp"
+#include "../de_common/helpers/helpers.hpp"
 
 #include "sdr_facade.hpp"
 #include "sdr_main.hpp"

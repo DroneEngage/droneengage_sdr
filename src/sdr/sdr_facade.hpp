@@ -1,7 +1,7 @@
 #ifndef SDR_FACADE_H_
 #define SDR_FACADE_H_
 
-#include "../de_common/de_facade_base.hpp"
+#include "../de_common/de_databus/de_facade_base.hpp"
 
 namespace de
 {

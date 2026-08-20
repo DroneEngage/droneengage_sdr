@@ -6,15 +6,15 @@
 
 
 
-#include "../de_common/messages.hpp"
-#include "../de_common/de_module.hpp"
+#include "../de_common/de_databus/messages.hpp"
+#include "../de_common/de_databus/de_module.hpp"
 #include "../defines.hpp"
 
 #include "sdr_facade.hpp"
 #include "sdr_parser.hpp"
 
 
-#include "../helpers/json_nlohmann.hpp"
+#include "../de_common/helpers/json_nlohmann.hpp"
 using Json_de = nlohmann::json;
 
 

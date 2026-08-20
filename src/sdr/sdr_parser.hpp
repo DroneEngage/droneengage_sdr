@@ -1,7 +1,7 @@
 #ifndef SDR_PARSER_H_
 #define SDR_PARSER_H_
 
-#include "../helpers/json_nlohmann.hpp"
+#include "../de_common/helpers/json_nlohmann.hpp"
 using Json_de = nlohmann::json;
 
 #include "sdr_facade.hpp"
