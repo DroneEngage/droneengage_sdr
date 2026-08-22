@@ -1,5 +1,3 @@
-#include "../defines.hpp"
-
 #include "../de_common/helpers/helpers.hpp"
 
 #include "sdr_facade.hpp"
@@ -45,13 +43,12 @@ void CSDR_Facade::API_SendSDRDrivers (const std::string& target_party_id) const
     std::vector<SoapySDR::Kwargs> device_args = cSDRDriver.get_device_agrs();
     SoapySDR::Kwargs device_arg;
     
-    Json_de drivers_array; 
-    Json_de driver;
+    Json_de drivers_array = Json_de::array();
 
     for(unsigned int k=0;k<device_args.size();++k)
     {
 		device_arg = device_args[k];
-        int driver_index = 0;
+        Json_de driver;
 		for (SoapySDR::Kwargs::const_iterator it = device_arg.begin(); it != device_arg.end(); ++it)
         {
             std::cout << it->first << " = " << it->second << std::endl;
@@ -59,8 +56,7 @@ void CSDR_Facade::API_SendSDRDrivers (const std::string& target_party_id) const
             if (it->first == "index")
             {
                 std::cout << it->first << " == " << it->second << std::endl;
-                driver_index = std::atoi(it->second.c_str());
-                driver[it->first] = driver_index;
+                driver[it->first] = std::atoi(it->second.c_str());
             }
             else
             {
@@ -68,7 +64,10 @@ void CSDR_Facade::API_SendSDRDrivers (const std::string& target_party_id) const
             }
 		}
 
-        drivers_array[driver_index] = driver;
+        // append rather than index by the device-reported "index" kwarg:
+        // that field is not guaranteed to be present/unique, and indexing by
+        // it silently overwrote/dropped devices that shared the same value.
+        drivers_array.push_back(driver);
         
     }
 

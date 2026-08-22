@@ -1,7 +1,6 @@
 #include "../de_common/helpers/colors.hpp"
 #include "../de_common/helpers/helpers.hpp"
 
-#include "../de_common/de_databus/configFile.hpp"
 #include "../de_common/de_databus/messages.hpp"
 #include "sdr_facade.hpp"
 #include "sdr_driver.hpp"
@@ -129,6 +128,20 @@ bool CSDRDriver::closeSDR()
             m_sdr->closeStream(m_rxStream);
 
             SoapySDR::Device::unmake(m_sdr);
+
+            // avoid dangling pointers: without this, a second closeSDR() call
+            // (e.g. openSDR() calling closeSDR() again, or two DISCONNECT
+            // commands in a row) would dereference a freed device/stream.
+            m_sdr = NULL;
+        }
+        m_rxStream = NULL;
+
+        // release the FFT plan created in openSDR(), otherwise every
+        // reconnect/reconfigure (openSDR() is called on SET_CONFIG too) leaks it.
+        if (p1 != nullptr)
+        {
+            fftwf_destroy_plan(p1);
+            p1 = nullptr;
         }
 
         // delete buffers
@@ -155,6 +168,15 @@ void CSDRDriver::pauseStreaming()
 
 void CSDRDriver::startStreaming()
 {
+    // Prevent multiple SDR_ACTION_READ_DATA commands from spawning overlapping
+    // streaming loops that would fight over m_exit/m_status concurrently.
+    bool expected = false;
+    if (!m_streaming_active.compare_exchange_strong(expected, true))
+    {
+        std::cout << "SDR streaming already active. Ignoring duplicate start request." << std::endl;
+        return;
+    }
+
     m_exit = false;
 
     do
@@ -169,6 +191,8 @@ void CSDRDriver::startStreaming()
     
     m_intervals = 0;
     setStatus(ENUM_STATE::CONNECTED);
+
+    m_streaming_active = false;
 }
 
 
@@ -193,6 +217,18 @@ bool CSDRDriver::openSDR()
 
     setStatus(ENUM_STATE::NOT_CONNECTED);
     setSDRDriverIndex(m_sdr_index);
+
+    // Reject a sample rate that would cause a bogus/huge buffer & FFT plan
+    // allocation (e.g. negative, zero, or an unreasonably large value coming
+    // from an unvalidated SET_CONFIG command).
+    if ((m_sample_rate <= 0) || (m_sample_rate > 200e6))
+    {
+        const std::string error_msg = "Invalid SDR sample rate.";
+        std::cout << error_msg << std::endl;
+        cSDR_Facade.sendErrorMessage(std::string(), 0, ERROR_TYPE_ERROR_P2P, NOTIFICATION_TYPE_ERROR, error_msg);
+        setStatus(ENUM_STATE::ERROR);
+        return false;
+    }
 
     // Open SDR Device.
     std::cout << "m_sdr_driver: " << m_sdr_driver << " m_sdr_index: " << m_sdr_index << std::endl;
@@ -322,6 +358,16 @@ void CSDRDriver::startStreamingOnce()
 
         
 
+        // m_bars is user-configurable (SDR_ACTION_SET_CONFIG "r"); guard against
+        // 0 (division by zero -> SIGFPE, uncatchable by try/catch) or a value
+        // larger than the sample rate (empty bins).
+        if ((m_bars == 0) || (m_bars > (uint64_t)m_sample_rate))
+        {
+            std::cout << "ERROR: invalid number of bars (" << m_bars << ") for sample rate " << m_sample_rate << std::endl;
+            setStatus(ENUM_STATE::CONNECTED);
+            return;
+        }
+
         const double frequency_min = m_freq_center - 0.5 * m_sample_rate;
         const uint64_t frequency_step_uint = (int)m_sample_rate / m_bars;
         const float frequency_step = static_cast<float>(m_sample_rate) / m_bars;
@@ -349,7 +395,7 @@ void CSDRDriver::startStreamingOnce()
 
             if ((m_trigger_level > 0) && (average_frequency_value > m_trigger_level))
             {
-                CSDR_Facade::getInstance().sendSignalAlert("", frequency_min + ((start_index + end_index) / 2 ), average_frequency_value);
+                CSDR_Facade::getInstance().sendSignalAlert("", frequency_min + ((start_index + end_index) / 2.0), average_frequency_value);
             }
         }
 

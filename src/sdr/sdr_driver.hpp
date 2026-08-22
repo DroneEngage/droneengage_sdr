@@ -10,6 +10,7 @@
 #include <liquid/liquid.h>
 #include <fftw3.h>
 #include <mutex>
+#include <atomic>
 
 
 namespace de
@@ -234,8 +235,8 @@ namespace sdr
             std::vector<float>buff2;
             
 
-            fftwf_plan p1;
-            fftwf_plan p2;
+            fftwf_plan p1 = nullptr;
+            fftwf_plan p2 = nullptr;
             size_t m_max_tx_unit;
 
             long m_size;
@@ -245,7 +246,8 @@ namespace sdr
             double m_sample_rate;
             uint64_t m_intervals = 0; // no interval
             uint64_t m_trigger_level = 0; // no trigger
-            bool m_exit = false;
+            std::atomic<bool> m_exit{false};
+            std::atomic<bool> m_streaming_active{false}; // prevents overlapping streaming threads/loops
 
             std::mutex m_lock;
     };

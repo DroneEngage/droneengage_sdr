@@ -127,7 +127,11 @@ void CSDRParser::parseMessage (Json_de &andruav_message, const char * full_messa
 
                         if (cmd.contains("fc"))
                         {
-                            cSDRDriver.setFrequencyCenter(cmd["fc"].get<double>());
+                            const double frequency_center = cmd["fc"].get<double>();
+                            if (frequency_center > 0)
+                            {
+                                cSDRDriver.setFrequencyCenter(frequency_center);
+                            }
                         }
 
                         if (cmd.contains("g"))
@@ -137,7 +141,18 @@ void CSDRParser::parseMessage (Json_de &andruav_message, const char * full_messa
 
                         if (cmd.contains("s"))
                         {
-                            cSDRDriver.setSampleRate(cmd["s"].get<double>());
+                            // reject non-positive / unreasonably large sample rates:
+                            // they would otherwise cause a huge/invalid buffer & FFT
+                            // plan allocation in CSDRDriver::openSDR().
+                            const double sample_rate = cmd["s"].get<double>();
+                            if ((sample_rate > 0) && (sample_rate <= 200e6))
+                            {
+                                cSDRDriver.setSampleRate(sample_rate);
+                            }
+                            else
+                            {
+                                std::cout << "SDR_ACTION_SET_CONFIG: invalid sample rate " << sample_rate << " ignored." << std::endl;
+                            }
                         }
 
                         if (cmd.contains("m"))
@@ -147,7 +162,17 @@ void CSDRParser::parseMessage (Json_de &andruav_message, const char * full_messa
 
                         if (cmd.contains("r"))
                         {
-                            cSDRDriver.setBars(cmd["r"].get<double>());
+                            // reject 0 (or negative): used as a divisor in
+                            // CSDRDriver::startStreamingOnce() and would crash (SIGFPE).
+                            const double bars = cmd["r"].get<double>();
+                            if (bars > 0)
+                            {
+                                cSDRDriver.setBars((uint64_t)bars);
+                            }
+                            else
+                            {
+                                std::cout << "SDR_ACTION_SET_CONFIG: invalid bars value " << bars << " ignored." << std::endl;
+                            }
                         }
 
                         if (validateField(cmd, "t", Json_de::value_t::number_unsigned))
