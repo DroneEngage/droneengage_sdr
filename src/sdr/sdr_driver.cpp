@@ -184,7 +184,11 @@ void CSDRDriver::startStreaming()
         startStreamingOnce();
         if (m_exit)
             break;
-        wait_time_nsec(0, m_intervals * 1000000000l);
+        // m_intervals is milliseconds (see SDR_ACTION field "t" / webclient
+        // "Interval (ms)" UI) - convert ms -> ns (1e6 ns per ms), NOT
+        // treated as whole seconds (that was a pre-existing unit bug: 1e9
+        // ns/sec made a UI value of e.g. 1000 wait ~16.7 minutes instead of 1s).
+        wait_time_nsec(0, m_intervals * 1000000l);
         if (m_exit)
             break;
     } while (m_intervals);
