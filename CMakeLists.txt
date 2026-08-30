@@ -27,7 +27,7 @@ message( FATAL_ERROR “In-source builds not allowed! Create a build directory a
 exit(1)
 endif()
 
-SET (__APP__VERSION__ "1.0.2")
+SET (__APP__VERSION__ "1.0.3")
 add_definitions( -D__APP__VERSION__="${__APP__VERSION__}")
 project(DE_SDR VERSION ${__APP__VERSION__})
 
